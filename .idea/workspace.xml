@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d67acaa7-690b-4940-aa02-d50f1a3230ab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SWTestingProject.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main/Book.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main/Member.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main/RepeatPromptCLI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/cli/CLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/model/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/Library.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/model/Library.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/Member.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/model/Member.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main/RepeatPromptCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/RepeatPromptCLI.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +26,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 0
 }]]></component>
@@ -41,12 +41,14 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.CLI.executor": "Run",
     "Application.Main.executor": "Coverage",
     "Application.RepeatPromptCLI.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/berendgrandt/Desktop/SWTestingProject/src/main/interface",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -55,6 +57,14 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/interface" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -71,7 +81,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1744135499939</updated>
-      <workItem from="1744135500973" duration="3296000" />
+      <workItem from="1744135500973" duration="6224000" />
     </task>
     <servers />
   </component>

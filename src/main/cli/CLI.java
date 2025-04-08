@@ -1,8 +1,12 @@
-package Main;
+package main.cli;
+
+import main.model.Book;
+import main.model.Library;
+import main.model.Member;
 
 import java.util.Scanner;
 
-public class RepeatPromptCLI {
+public class CLI {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 

@@ -1,5 +1,6 @@
-package main.model;
+package Models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
@@ -7,10 +8,7 @@ public class Member {
     public String Name;
     public String Email;
     public String MemberID;
-//    FIXME: Replace with Book class (Strings for BookID s for now)
-    public List<String> BorrowedBookList;
-
-    public Member(){}
+    public List<String> BorrowedBookList = new ArrayList<String>();
 
     public Member(String Name, String Email, String MemberID) {
         this.Name = Name;

@@ -1,4 +1,4 @@
-package main.model;
+package Models;
 
 public class Book {
     String Name;
@@ -8,9 +8,6 @@ public class Book {
     Boolean IsAvailable;
     int ISBN;
     String BookID;
-
-//
-    public Book(){}
 
     public Book(String Name, String Author, int Year, String Genre, int ISBN, String BookID) {
         this.Name = Name;
@@ -22,7 +19,6 @@ public class Book {
         this.ISBN = ISBN;
     }
 
-//
     public Boolean checkAvailability(){
         return this.IsAvailable;
     }
@@ -39,14 +35,14 @@ public class Book {
 
     public String getBookInfo() {
         return String.format(
-                "Name: %s, Author: %s, Year: %d, Genre: %s, ISBN: %d, BookID: %s, Available: %s",
-                this.Name,
-                this.Author,
-                this.Year,
-                this.Genre,
-                this.ISBN,
-                this.BookID,
-                this.IsAvailable ? "Yes" : "No"
+            "Name: %s, Author: %s, Year: %d, Genre: %s, ISBN: %d, BookID: %s, Available: %s",
+            this.Name,
+            this.Author,
+            this.Year,
+            this.Genre,
+            this.ISBN,
+            this.BookID,
+            this.IsAvailable ? "Yes" : "No"
         );
     }
 }

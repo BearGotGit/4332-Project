@@ -61,6 +61,7 @@ public class CLI {
                     }
 
                     Book newBook = library.addBook(name, author, year, genre, isbn);
+                    if (newBook == null) { break; }
 
                     System.out.println("Successfully added a new book!");
                     System.out.println(newBook.getBookInfo());

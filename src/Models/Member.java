@@ -8,7 +8,7 @@ public class Member {
     public String Name;
     public String Email;
     public String MemberID;
-    public List<String> BorrowedBookList = new ArrayList<String>();
+    public List<String> BorrowedBookList = new ArrayList<String>(); // Holds book IDs
 
     public Member(String Name, String Email, String MemberID) {
         this.Name = Name;

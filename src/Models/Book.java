@@ -19,20 +19,12 @@ public class Book {
         this.ISBN = ISBN;
     }
 
+    // Check if book is available
     public Boolean checkAvailability(){
         return this.IsAvailable;
     }
 
-    public void updateBookInfo(String Name, String Author, int Year, String Genre, int ISBN, String BookID, boolean IsAvailable){
-        this.Name = Name;
-        this.Author = Author;
-        this.Year = Year;
-        this.Genre = Genre;
-        this.ISBN = ISBN;
-        this.BookID = BookID;
-        this.IsAvailable = IsAvailable;
-    }
-
+    // Get info about a book
     public String getBookInfo() {
         return String.format(
             "Name: %s, Author: %s, Year: %d, Genre: %s, ISBN: %d, BookID: %s, Available: %s",
@@ -44,5 +36,16 @@ public class Book {
             this.BookID,
             this.IsAvailable ? "Yes" : "No"
         );
+    }
+
+    // Update the info of a book
+    public void updateBookInfo(String Name, String Author, int Year, String Genre, int ISBN, String BookID, boolean IsAvailable){
+        this.Name = Name;
+        this.Author = Author;
+        this.Year = Year;
+        this.Genre = Genre;
+        this.ISBN = ISBN;
+        this.BookID = BookID;
+        this.IsAvailable = IsAvailable;
     }
 }

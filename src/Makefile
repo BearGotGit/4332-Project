@@ -7,12 +7,15 @@ JAVA_FLAGS=-cp
 #	 It defaults to the first rule if u just use make
 # Clean with make clean
 
-all: out/Main/*.class Models/*.class # These are the dependencies
+all: out/Main/*.class # These are the dependencies
 
-run: out/Main/*.class Models/*.class
-	java ${JAVA_FLAGS} out Main.CLI
+run: Main/*.java
+	make clean && make execute
 
-out/Main/*.class Models/*.class: Main/*.java Models/*.java
+execute: out/Main/*.class
+	clear; java ${JAVA_FLAGS} out Main.CLI
+
+out/Main/*.class: Main/*.java Models/*.java
 # This is the command it runs if it has the dependencies
 	javac ${JAVAC_FLAGS} out Main/*.java Models/*.java
 

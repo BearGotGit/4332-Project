@@ -163,7 +163,11 @@ public class Library {
             return;
         }
         book.IsAvailable = true;
-        LoanedBooksIDs.remove(book.BookID); // no check needed, this is safe
+        if (!LoanedBooksIDs.contains(bookID)) {
+            System.out.println("Book with ID: " + bookID + " is not checked out of the library.");
+            return;
+        }
+        LoanedBooksIDs.remove(book.BookID);
         AvailableBookIDs.add(bookID);
         Member member = Members.stream().filter(m -> m.BorrowedBookList.contains(book.BookID)).findFirst().orElse(null);
         if (member != null) {

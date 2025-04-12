@@ -1,13 +1,13 @@
 package Models;
 
 public class Book {
-    String Name;
-    String Author;
-    int Year;
-    String Genre;
-    Boolean IsAvailable;
-    int ISBN;
-    String BookID;
+    public String Name;
+    public String Author;
+    public int Year;
+    public String Genre;
+    public Boolean IsAvailable;
+    public int ISBN;
+    public String BookID;
 
     public Book(String Name, String Author, int Year, String Genre, int ISBN, String BookID) {
         this.Name = Name;

@@ -1,4 +1,4 @@
-package Models;
+package CLI.Models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -197,7 +197,6 @@ public class Library {
             count++;
         }
         Member newMember = new Member(name, email, String.valueOf(newMemberID));
-        // MemberIDs.add(newMember.MemberID);
         Members.add(newMember);
         System.out.println("Member " + newMember.MemberID + " added successfully.");
         return newMember;

@@ -1,4 +1,4 @@
-package Models;
+package CLI.Models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,8 @@ public class Member {
     public String MemberID;
     public List<String> BorrowedBookList = new ArrayList<String>(); // Holds book IDs
 
+    String testableMemberInfo; // only visible to the same package (only tests can see it)
+
     public Member(String Name, String Email, String MemberID) {
         this.Name = Name;
         this.Email = Email;
@@ -17,8 +19,10 @@ public class Member {
     }
 
     public void printMemberInfo(){
-        String formatted = String.format("Name: %s, Email: %s, MemberID: %s", Name, Email, MemberID);
+        String formatted = String.format("Name: %s, Email: %s, MemberID: %s",
+                Name, Email, MemberID);
         System.out.println(formatted);
+        testableMemberInfo = formatted;
     }
 
     public List<String> getBorrowedBookList(){

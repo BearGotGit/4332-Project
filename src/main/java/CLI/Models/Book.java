@@ -1,4 +1,4 @@
-package Models;
+package CLI.Models;
 
 public class Book {
     public String Name;

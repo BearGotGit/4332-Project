@@ -1,11 +1,11 @@
-package test.Models;
+package CLI.Models;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import Models.*;
+import CLI.Models.*;
 
-public class BookTest {
+public class LibraryTest {
     @Test
     void testSetupWorks() {
 

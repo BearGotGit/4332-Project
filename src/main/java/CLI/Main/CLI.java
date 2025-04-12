@@ -1,8 +1,6 @@
-package Main;
+package CLI.Main;
 
-import Models.Book;
-import Models.Library;
-import Models.Member;
+import CLI.Models.*;
 
 import java.util.Scanner;
 

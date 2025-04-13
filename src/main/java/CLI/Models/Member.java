@@ -13,12 +13,24 @@ public class Member {
     String testableMemberInfo; // only visible to the same package (only tests can see it)
 
     public Member(String Name, String Email, String MemberID) {
+        if (Name == null || Name.isEmpty()) {
+            System.out.println("ERROR: Name is null or empty");
+            return;
+        }
+        if (Email == null) {
+            System.out.println("ERROR: Email is null");
+            return;
+        }
+        if (MemberID == null || MemberID.isEmpty()) {
+            System.out.println("ERROR: MemberID is null or empty");
+            return;
+        }
         this.Name = Name;
         this.Email = Email;
         this.MemberID = MemberID;
     }
 
-    public void printMemberInfo(){
+    public void printMemberInfo() {
         String formatted = String.format("Name: %s, Email: %s, MemberID: %s",
                 Name, Email, MemberID);
         System.out.println(formatted);
@@ -29,20 +41,36 @@ public class Member {
         return BorrowedBookList;
     }
 
-    public void addBorrowedBook(String BookID) {
+    public void addBorrowedBook(String bookID) {
+        if (bookID == null || bookID.isEmpty()) {
+            System.out.println("ERROR: BookID is null or empty");
+            return;
+        }
         // if book exists, return false
-        if (BorrowedBookList.contains(BookID)) {
+        if (BorrowedBookList.contains(bookID)) {
             System.out.println("There is already a Book Borrowed!");
             return;
         }
-        BorrowedBookList.add(BookID);
+        BorrowedBookList.add(bookID);
     }
 
     public void removeBorrowedBook(String bookID) {
+        if (bookID == null || bookID.isEmpty()) {
+            System.out.println("ERROR: BookID is null or empty");
+            return;
+        }
         BorrowedBookList.remove(bookID);
     }
 
     public void updateMemberInfo(String Name, String Email) {
+        if (Name == null || Name.isEmpty()) {
+            System.out.println("ERROR: Name is null or empty");
+            return;
+        }
+        if (Email == null || Email.isEmpty()) {
+            System.out.println("ERROR: Name is null or empty");
+            return;
+        }
         this.Name = Name;
         this.Email = Email;
     }

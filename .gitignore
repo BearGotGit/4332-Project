@@ -1,3 +1,5 @@
+src/test/.jqwik-database
+
 ### IntelliJ IDEA ###
 **/out/
 !**/src/main/**/out/

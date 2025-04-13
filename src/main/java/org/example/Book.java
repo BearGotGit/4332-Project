@@ -50,6 +50,4 @@ public class Book
         this.IsAvailable = IsAvailable;
     }
 
-
-
 }

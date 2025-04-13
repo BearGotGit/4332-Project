@@ -11,7 +11,8 @@ public class Library {
     public List<String> LoanedBooksIDs;
     public List<Member> Members;
 
-    // Default constructor
+
+
     public Library() {
         AllBooksInLibrary = new ArrayList<Book>();
         AvailableBookIDs = new ArrayList<String>();
@@ -69,18 +70,19 @@ public class Library {
             return null;
         }
 
-        while (true) {
+        while (count<1000) {
             String idString = String.valueOf(newBookID);
             if (!AllBooksInLibrary.stream().anyMatch(b -> b.BookID.equals(idString))) {
                 // Found uniqueID
                 break;
             }
+            newBookID++;
+            count++;
             if (count >= 1000) {
                 System.out.println("Book could not be created.");
                 return null;
             }
-            newBookID++;
-            count++;
+
         }
         Book newBook = new Book(name, author, year, genre, isbn, String.valueOf(newBookID));
         AllBooksInLibrary.add(newBook);

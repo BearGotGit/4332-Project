@@ -62,33 +62,25 @@ public class Library {
 
     // Create and add a new book
     public Book addBook(String name, String author, int year, String genre, int isbn) {
-        int count = 0;
-        int newBookID = 1;
-
         if (AllBooksInLibrary.stream().anyMatch(b -> b.Name.equals(name))) {
             System.out.println("Book " + name + " already exists.");
             return null;
         }
 
-        while (count<1000) {
+        for (int newBookID = 1; newBookID <= 1000; newBookID++) {
             String idString = String.valueOf(newBookID);
-            if (!AllBooksInLibrary.stream().anyMatch(b -> b.BookID.equals(idString))) {
-                // Found uniqueID
-                break;
+            boolean exists = AllBooksInLibrary.stream().anyMatch(b -> b.BookID.equals(idString));
+            if (!exists) {
+                Book newBook = new Book(name, author, year, genre, isbn, idString);
+                AllBooksInLibrary.add(newBook);
+                AvailableBookIDs.add(newBook.BookID);
+                System.out.println("Book " + newBook.BookID + " added successfully.");
+                return newBook;
             }
-            newBookID++;
-            count++;
-            if (count >= 1000) {
-                System.out.println("Book could not be created.");
-                return null;
-            }
-
         }
-        Book newBook = new Book(name, author, year, genre, isbn, String.valueOf(newBookID));
-        AllBooksInLibrary.add(newBook);
-        AvailableBookIDs.add(newBook.BookID);
-        System.out.println("Book " + newBook.BookID + " added successfully.");
-        return newBook;
+
+        System.out.println("Book could not be created.");
+        return null;
     }
 
     // Remove a book by ID

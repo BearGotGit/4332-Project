@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a3de7f46-e72d-41b2-9e25-264e032943dd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Book.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Library.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Library.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/org/example/LibraryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/example/LibraryTest.java" afterDir="false" />
     </list>
@@ -40,7 +39,7 @@
     "JUnit.LibraryTest.executor": "Coverage",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "Bruce__Branch",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/me/Desktop/testing_group/4332-Project",
     "project.structure.last.edited": "Modules",
@@ -65,7 +64,7 @@
     <servers />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/4332_Project$LibraryTest.ic" NAME="LibraryTest Coverage Results" MODIFIED="1744544688778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+    <SUITE FILE_PATH="coverage/4332_Project$LibraryTest.ic" NAME="LibraryTest Coverage Results" MODIFIED="1744563759424" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
       <FILTER>org.example.*</FILTER>
     </SUITE>
   </component>

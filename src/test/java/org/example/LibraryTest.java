@@ -85,6 +85,19 @@ public class LibraryTest {
         assertEquals(null, library.whoHasBook("B999"));
     }
 
+    // Member exists but does NOT have the book
+    @Test
+    void whoHasBook_loanedButNoMemberHasIt() {
+        library.AllBooksInLibrary.add(new Book("Book_NotTrigger", "AuthorX", 2023, "Genre", 9999, "L123"));
+        library.LoanedBooksIDs.add("L123");
+
+        Member m = new Member("M5", "Email", "m5@example.com");
+        library.Members.add(m);
+
+        Member result = library.whoHasBook("L123");
+        assertEquals(null, result);
+    }
+
 
     //Tests to add book and check to ensure proper storage
     @Test
@@ -215,4 +228,5 @@ public class LibraryTest {
         library.checkoutBook("M3", "Name_4");
         assertEquals(false, member.BorrowedBookList.contains("B010"));
     }
+
 }

@@ -13,7 +13,7 @@ run: Main/*.java
 	make clean && make execute
 
 execute: out/Main/*.class
-	clear; java ${JAVA_FLAGS} out Main.CLI
+	clear; java ${JAVA_FLAGS} out CLI.Main.CLI
 
 out/Main/*.class: Main/*.java Models/*.java
 # This is the command it runs if it has the dependencies

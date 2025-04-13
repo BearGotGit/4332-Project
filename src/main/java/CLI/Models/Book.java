@@ -27,13 +27,12 @@ public class Book {
     // Get info about a book
     public String getBookInfo() {
         return String.format(
-            "Name: %s, Author: %s, Year: %d, Genre: %s, ISBN: %d, BookID: %s, Available: %s",
+            "Name: %s, Author: %s, Year: %d, Genre: %s, ISBN: %d, Available: %s",
             this.Name,
             this.Author,
             this.Year,
             this.Genre,
             this.ISBN,
-            this.BookID,
             this.IsAvailable ? "Yes" : "No"
         );
     }

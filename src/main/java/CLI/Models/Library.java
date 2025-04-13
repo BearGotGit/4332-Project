@@ -133,7 +133,7 @@ public class Library {
             return;
         }
         else if (!AvailableBookIDs.contains(bookID)) {
-            System.out.println("Book with ID: " + bookID + " is already checked out out!");
+            System.out.println("Book with ID: " + bookID + " is already checked out!");
             return;
         }
 
@@ -156,7 +156,16 @@ public class Library {
     }
 
     // Return a book to the library
-    public void returnBook(String bookID) {
+    public void returnBook(String memberID, String bookID) {
+        Member member = Members.stream()
+                                .filter(m -> m.MemberID.equals(memberID) && 
+                                        m.BorrowedBookList.contains(bookID))
+                                .findFirst()
+                                .orElse(null);
+        if (member == null) {
+            System.out.println("Member with ID: " + memberID + " has either not checked out the book with ID: " + bookID + " or they are not a member.");
+            return;
+        }
         Book book = AllBooksInLibrary.stream().filter(b -> b.BookID.equals(bookID)).findFirst().orElse(null);
         if (book == null) {
             System.out.println("Book with ID: " + bookID + " does not exist in the library.");
@@ -165,10 +174,7 @@ public class Library {
         book.IsAvailable = true;
         LoanedBooksIDs.remove(book.BookID); // no check needed, this is safe
         AvailableBookIDs.add(bookID);
-        Member member = Members.stream().filter(m -> m.BorrowedBookList.contains(book.BookID)).findFirst().orElse(null);
-        if (member != null) {
-            member.BorrowedBookList.remove(bookID); // no check needed, this is safe
-        }
+        member.BorrowedBookList.remove(bookID); // no check needed, this is safe
         System.out.println("Book " + book.Name + " returned successfully.");
     }
 

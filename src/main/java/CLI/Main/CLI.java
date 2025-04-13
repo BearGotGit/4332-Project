@@ -9,7 +9,7 @@ public class CLI {
         Scanner scanner = new Scanner(System.in);
 
         Library library = new Library();
-        seedLibrary(library); // optional
+        // seedLibrary(library); // Comment this out if u don't want it
 
         String stars = "****************************************************";
 

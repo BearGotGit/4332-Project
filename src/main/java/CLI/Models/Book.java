@@ -5,18 +5,18 @@ public class Book {
     public String Author;
     public int Year;
     public String Genre;
-    public Boolean IsAvailable;
     public int ISBN;
     public String BookID;
+    public Boolean IsAvailable;
 
     public Book(String Name, String Author, int Year, String Genre, int ISBN, String BookID) {
         this.Name = Name;
         this.Author = Author;
         this.Year = Year;
-        this.BookID = BookID;
-        this.IsAvailable = true;
         this.Genre = Genre;
         this.ISBN = ISBN;
+        this.BookID = BookID;
+        this.IsAvailable = true;
     }
 
     // Check if book is available

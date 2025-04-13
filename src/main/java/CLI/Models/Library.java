@@ -61,32 +61,24 @@ public class Library {
 
     // Create and add a new book
     public Book addBook(String name, String author, int year, String genre, int isbn) {
-        int count = 0;
-        int newBookID = 1;
-
         if (AllBooksInLibrary.stream().anyMatch(b -> b.Name.equals(name))) {
             System.out.println("Book " + name + " already exists.");
             return null;
         }
 
-        while (true) {
+        for (int newBookID = 1; newBookID <= 1000; newBookID++) {
             String idString = String.valueOf(newBookID);
-            if (!AllBooksInLibrary.stream().anyMatch(b -> b.BookID.equals(idString))) { 
-                // Found uniqueID
-                break; 
+            if (!AllBooksInLibrary.stream().anyMatch(b -> b.BookID.equals(idString))) {
+                Book newBook = new Book(name, author, year, genre, isbn, idString);
+                AllBooksInLibrary.add(newBook);
+                AvailableBookIDs.add(newBook.BookID);
+                System.out.println("Book " + newBook.BookID + " added successfully.");
+                return newBook;
             }
-            if (count >= 1000) {
-                System.out.println("Book could not be created.");
-                return null;
-            }
-            newBookID++;
-            count++;
         }
-        Book newBook = new Book(name, author, year, genre, isbn, String.valueOf(newBookID));
-        AllBooksInLibrary.add(newBook);
-        AvailableBookIDs.add(newBook.BookID);
-        System.out.println("Book " + newBook.BookID + " added successfully.");
-        return newBook;
+
+        System.out.println("Book could not be created.");
+        return null;
     }
 
     // Remove a book by ID
@@ -187,25 +179,17 @@ public class Library {
 
     // Add a new member to the library
     public Member addMember(String name, String email) {
-        int newMemberID = 1;
-        int count = 0;
-        while (true) {
+        for (int newMemberID = 1; newMemberID <= 1000; newMemberID++) {
             String idString = String.valueOf(newMemberID);
             if (!Members.stream().anyMatch(m -> m.MemberID.equals(idString))) {
-                // Found uniqueID
-                break;
+                Member newMember = new Member(name, email, String.valueOf(newMemberID));
+                Members.add(newMember);
+                System.out.println("Member " + newMember.MemberID + " added successfully.");
+                return newMember;
             }
-            if (count >= 1000) {
-                System.out.println("Member could not be created.");
-                return null;
-            }
-            newMemberID++;
-            count++;
         }
-        Member newMember = new Member(name, email, String.valueOf(newMemberID));
-        Members.add(newMember);
-        System.out.println("Member " + newMember.MemberID + " added successfully.");
-        return newMember;
+        System.out.println("Member could not be created.");
+        return null;
     }
 
     // Revoke membership of a member

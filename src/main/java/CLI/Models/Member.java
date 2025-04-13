@@ -42,10 +42,9 @@ public class Member {
         BorrowedBookList.remove(bookID);
     }
 
-    public void updateMemberInfo(String Name, String Email, String MemberID) {
+    public void updateMemberInfo(String Name, String Email) {
         this.Name = Name;
         this.Email = Email;
-        this.MemberID = MemberID;
     }
 
 }

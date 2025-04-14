@@ -53,19 +53,19 @@ public class CLI {
                     System.out.println("You chose to add a new book");
                     System.out.print("Enter book name: ");
                     String name = scanner.nextLine();
-                    if (name == null || name.isEmpty()) {
+                    if (name.isEmpty()) {
                         System.out.println("\nNot a valid name");
                         break;
                     }
                     System.out.print("Enter author: ");
                     String author = scanner.nextLine();
-                    if (author == null || author.isEmpty()) {
+                    if (author.isEmpty()) {
                         System.out.println("\nNot a valid author");
                         break;
                     }
                     System.out.print("Enter year: ");
                     String yearString = scanner.nextLine();
-                    if (yearString == null || yearString.isEmpty()) {
+                    if (yearString.isEmpty()) {
                         System.out.println("\nNot a valid year");
                         break;
                     }
@@ -78,13 +78,13 @@ public class CLI {
                     }
                     System.out.print("Enter Genre: ");
                     String genre = scanner.nextLine();
-                    if (genre == null || genre.isEmpty()) {
+                    if (genre.isEmpty()) {
                         System.out.println("\nNot a valid genre");
                         break;
                     }
                     System.out.print("Enter ISBN: ");
                     String isbnString = scanner.nextLine();
-                    if (isbnString == null || isbnString.isEmpty()) {
+                    if (isbnString.isEmpty()) {
                         System.out.println("\nNot a valid ISBN");
                         break;
                     }
@@ -110,7 +110,7 @@ public class CLI {
                     System.out.println("You chose to remove a book");
                     System.out.print("Enter book name to remove: ");
                     String book = scanner.nextLine();
-                    if (book == null || book.isEmpty()) {
+                    if (book.isEmpty()) {
                         System.out.println("\nNot a valid book name");
                         break;
                     }
@@ -129,7 +129,7 @@ public class CLI {
                     System.out.println("You chose to check a book's availability");
                     System.out.print("Enter book name: ");
                     String book = scanner.nextLine();
-                    if (book == null || book.isEmpty()) {
+                    if (book.isEmpty()) {
                         System.out.println("\nNot a valid genre");
                         break;
                     }
@@ -150,6 +150,7 @@ public class CLI {
                     }
                     break;
                 }
+
                 // 4. Checkout Book
                 case "4": {
                     System.out.println("You chose to checkout a new book");
@@ -170,6 +171,7 @@ public class CLI {
                     library.checkoutBook(memberID, book);
                     break;
                 }
+
                 // 5. Return Book
                 case "5": {
                     System.out.println("You chose to return a book");
@@ -194,6 +196,7 @@ public class CLI {
                     library.returnBook(memberID, bookID);
                     break;
                 }
+
                 // 6. View All Books
                 case "6": {
                     if (library.AllBooksInLibrary == null || library.AllBooksInLibrary.size() <= 0) {
@@ -205,6 +208,7 @@ public class CLI {
                     }
                     break;
                 }
+
                 // 7. Add Member
                 case "7": {
                     System.out.println("You chose to add a new member");

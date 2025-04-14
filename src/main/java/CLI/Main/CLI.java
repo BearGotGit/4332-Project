@@ -5,10 +5,15 @@ import CLI.Models.*;
 import java.util.Scanner;
 
 public class CLI {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    Scanner scanner;
+    Library library;
 
-        Library library = new Library();
+    public CLI(Readable input, Library library) {
+        this.scanner = new Scanner(input);
+        this.library = library;
+    }
+
+    public void run() {
         // seedLibrary(library); // Comment this out if u don't want it
 
         String stars = "****************************************************";
@@ -294,7 +299,7 @@ public class CLI {
 
         // Seed members
         library.addMember("Alex", "brodsky.alex22@gmail.com");
-        library.addMember("Berend", "idk");
+        library.addMember("Berend", "beraulndt@gmail.com");
         library.addMember("Shawn", "idk");
         library.addMember("Bruce", "idk");
 

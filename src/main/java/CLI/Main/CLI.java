@@ -2,6 +2,7 @@ package CLI.Main;
 
 import CLI.Models.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class CLI {
@@ -14,8 +15,6 @@ public class CLI {
     }
 
     public void run() {
-        // seedLibrary(library); // Comment this out if u don't want it
-
         String stars = "****************************************************";
 
         String input = "";
@@ -252,11 +251,12 @@ public class CLI {
                 }
                 // 9. View All Members
                 case "9": {
-                    if (library.Members == null || library.Members.size() <= 0) {
+                    List<Member> allMembers = library.getAllMembers();
+                    if (allMembers == null || allMembers.size() <= 0) {
                         System.out.println("There are no members of this library");
                         break;
                     }
-                    for (Member member : library.Members) {
+                    for (Member member : allMembers) {
                        member.printMemberInfo();
                     }
                     break;
@@ -280,30 +280,6 @@ public class CLI {
                 input = scanner.nextLine();
             }
         }
-
         scanner.close();
-    }
-
-    private static void seedLibrary(Library library) {
-        // Seed books
-        library.addBook("1984", "George Orwell", 1949, "Dystopian", 1);
-        library.addBook("To Kill a Mockingbird", "Harper Lee", 1960, "Fiction", 2);
-        library.addBook("The Great Gatsby", "F. Scott Fitzgerald", 1925, "Classic", 3);
-        library.addBook("The Hobbit", "J.R.R. Tolkien", 1937, "Fantasy", 3);
-        library.addBook("Pride and Prejudice", "Jane Austen", 1813, "Romance", 4);
-        library.addBook("Moby Dick", "Herman Melville", 1851, "Adventure", 6);
-        library.addBook("The Catcher in the Rye", "J.D. Salinger", 1951, "Fiction", 7);
-        library.addBook("Brave New World", "Aldous Huxley", 1932, "Dystopian", 8);
-        library.addBook("The Alchemist", "Paulo Coelho", 1988, "Philosophical", 9);
-        library.addBook("The Road", "Cormac McCarthy", 2006, "Post-apocalyptic", 10);
-
-        // Seed members
-        library.addMember("Alex", "brodsky.alex22@gmail.com");
-        library.addMember("Berend", "beraulndt@gmail.com");
-        library.addMember("Shawn", "idk");
-        library.addMember("Bruce", "idk");
-
-        // Clear the screen
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n");
     }
 }

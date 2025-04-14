@@ -208,7 +208,7 @@ public class LibraryTest {
         assertEquals(loanedBefore, loanedAfter);
     }
 
-    //Test existing member but non existing book
+    //Test existing member but non-existing book
     @Test
     void checkoutBook_bookNotFound() {
         Member m = new Member("M1", "Test", "test@example.com");
@@ -231,7 +231,7 @@ public class LibraryTest {
         assertEquals(1, member.BorrowedBookList.size());
     }
 
-    //Test to checkout nonavailable book
+    //Test to check out non-available book
     @Test
     void checkoutBook_bookNotAvailable() {
         Member member = new Member("M3", "Not Available", "na@example.com");
@@ -242,5 +242,211 @@ public class LibraryTest {
         assertEquals(false, member.BorrowedBookList.contains("B010"));
     }
 
+    //Test for returning a book that was loaned out
+    @Test
+    void returnBook_successfullyReturnsBook() {
+        Member member = new Member("M10", "Return Tester", "return@example.com");
+        library.Members.add(member);
 
+        Book book = new Book("ReturnMe", "Author", 2020, "Mystery", 54321, "B100");
+        library.AllBooksInLibrary.add(book);
+        library.LoanedBooksIDs.add("B100");
+        member.BorrowedBookList.add("B100");
+
+        library.returnBook(member.MemberID, "B100");
+
+        assertEquals(true, library.AvailableBookIDs.contains("B100"));
+        assertEquals(false, library.LoanedBooksIDs.contains("B100"));
+        assertEquals(false, member.BorrowedBookList.contains("B100"));
+        assertEquals(true, book.IsAvailable);
+    }
+
+    //Test for returning a book when member doesn't exist
+    @Test
+    void returnBook_memberNotFound() {
+        Book book = new Book("NoMember", "Author", 2019, "Adventure", 11111, "B101");
+        library.AllBooksInLibrary.add(book);
+        library.LoanedBooksIDs.add("B101");
+
+        library.returnBook("NOT_REAL", "B101");
+
+        assertEquals(true, library.LoanedBooksIDs.contains("B101"));
+        assertEquals(false, library.AvailableBookIDs.contains("B101"));
+    }
+
+    //Test for returning a book that member hasn't borrowed
+    @Test
+    void returnBook_bookNotBorrowedByMember() {
+        Member member = new Member("M11", "Wrong Member", "wrong@example.com");
+        library.Members.add(member);
+
+        Book book = new Book("NotYours", "Author", 2018, "Comedy", 22222, "B102");
+        library.AllBooksInLibrary.add(book);
+        library.LoanedBooksIDs.add("B102");
+
+        library.returnBook("M11", "B102");
+
+        assertEquals(true, library.LoanedBooksIDs.contains("B102"));
+        assertEquals(false, library.AvailableBookIDs.contains("B102"));
+    }
+
+    //Test for returning a book that doesn't exist
+    @Test
+    void returnBook_bookNotFound() {
+        Member member = new Member("M12", "No Book", "nobook@example.com");
+        member.BorrowedBookList.add("B999");
+        library.Members.add(member);
+
+        library.returnBook("M12", "B999");
+
+        assertEquals(true, member.BorrowedBookList.contains("B999"));
+    }
+
+    //Test for getting all members
+    @Test
+    void getAllMembers_returnsCorrectList() {
+        Member member1 = new Member("M20", "Member1", "member1@example.com");
+        Member member2 = new Member("M21", "Member2", "member2@example.com");
+        library.Members.add(member1);
+        library.Members.add(member2);
+
+        List<Member> result = library.getAllMembers();
+
+        assertEquals(2, result.size());
+        assertEquals(true, result.contains(member1));
+        assertEquals(true, result.contains(member2));
+    }
+
+    //Test for adding a new member successfully
+    @Test
+    void addMember_successfullyAddsMember() {
+        Member member = library.addMember("New Member", "new@example.com");
+
+        assertEquals(false, member == null);
+        assertEquals("New Member", member.Name);
+        assertEquals("new@example.com", member.Email);
+        assertEquals(true, library.Members.contains(member));
+    }
+
+    //Test for adding a member with next available ID
+    @Test
+    void addMember_assignsCorrectID() {
+        library.Members.add(new Member("Existing", "existing@example.com", "1"));
+
+        Member newMember = library.addMember("Second Member", "second@example.com");
+
+        assertEquals(false, newMember == null);
+        assertEquals("2", newMember.MemberID);
+    }
+
+    //Test for adding member after 1000 IDs are taken
+    @Test
+    void addMember_failsAfter1000Tries() {
+        for (int i = 1; i <= 1000; i++) {
+            library.Members.add(new Member("Block_" + i, "block" + i + "@example.com", String.valueOf(i)));
+        }
+
+        Member result = library.addMember("TooMany", "toomany@example.com");
+
+        assertEquals(null, result);
+    }
+
+    //Test for revoking membership successfully
+    @Test
+    void revokeMembership_successfullyRevokesMembership() {
+        Member member = new Member("Revoke Me", "revoke@example.com", "M30");
+        library.Members.add(member);
+
+        boolean result = library.revokeMembership("M30");
+
+        assertEquals(true, result);
+        assertEquals(false, library.Members.contains(member));
+    }
+
+    //Test for revoking membership when member doesn't exist
+    @Test
+    void revokeMembership_memberNotFound() {
+        boolean result = library.revokeMembership("NOT_REAL");
+
+        assertEquals(false, result);
+    }
+
+    //Test for revoking membership and returning borrowed books (multiple)
+    @Test
+    void revokeMembership_returnsAllBorrowedBooks() {
+        Member member = new Member("Book Holder", "holder@example.com", "M31");
+        member.BorrowedBookList.add("B201");
+        member.BorrowedBookList.add("B202");
+        library.Members.add(member);
+
+        Book book1 = new Book("Book1", "Author1", 2010, "Adventure", 33333, "B201");
+        Book book2 = new Book("Book2", "Author2", 2011, "Comedy", 44444, "B202");
+        book1.IsAvailable = false;
+        book2.IsAvailable = false;
+
+        library.AllBooksInLibrary.add(book1);
+        library.AllBooksInLibrary.add(book2);
+        library.LoanedBooksIDs.add("B201");
+        library.LoanedBooksIDs.add("B202");
+
+        library.revokeMembership("M31");
+
+        assertEquals(true, book1.IsAvailable);
+        assertEquals(true, book2.IsAvailable);
+        assertEquals(true, library.AvailableBookIDs.contains("B201"));
+        assertEquals(true, library.AvailableBookIDs.contains("B202"));
+        assertEquals(false, library.LoanedBooksIDs.contains("B201"));
+        assertEquals(false, library.LoanedBooksIDs.contains("B202"));
+    }
+
+    //Test successful checkout workflow
+    @Test
+    void checkoutBook_successfulCheckout() {
+        Member member = new Member("Checkout Tester", "checkout@example.com", "M40");
+        library.Members.add(member);
+
+        Book book = new Book("CheckMeOut", "Great Author", 2022, "Fiction", 55555, "B301");
+        book.IsAvailable = true;
+        library.AllBooksInLibrary.add(book);
+        library.AvailableBookIDs.add("B301");
+
+        library.checkoutBook("M40", "CheckMeOut");
+
+        assertEquals(true, member.BorrowedBookList.contains("B301"));
+        assertEquals(false, book.IsAvailable);
+        assertEquals(true, library.LoanedBooksIDs.contains("B301"));
+        assertEquals(false, library.AvailableBookIDs.contains("B301"));
+    }
+
+    //Test checkout with book that exists in AllBooksInLibrary but not in AvailableBookIDs
+    @Test
+    void checkoutBook_bookExistsButNotAvailable() {
+        Member member = new Member("M41", "Unavailable Tester", "unavail@example.com");
+        library.Members.add(member);
+
+        Book book = new Book("Unavailable", "Some Author", 2021, "Mystery", 66666, "B401");
+        book.IsAvailable = false;
+        library.AllBooksInLibrary.add(book);
+
+        library.checkoutBook("M41", "Unavailable");
+
+        assertEquals(false, member.BorrowedBookList.contains("B401"));
+        assertEquals(false, library.AvailableBookIDs.contains("B401"));
+    }
+
+    //Test checkout when book doesn't exist but ID is in AvailableBookIDs
+    @Test
+    void checkoutBook_idAvailableButNoBook() {
+        Member member = new Member("M42", "Phantom Book", "phantom@example.com");
+        library.Members.add(member);
+
+        library.AvailableBookIDs.add("B501");
+        String bookID = library.findBookIdByName("Phantom");
+
+        assertEquals(null, bookID);
+
+        library.checkoutBook("M42", "Phantom");
+
+        assertEquals(0, member.BorrowedBookList.size());
+    }
 }

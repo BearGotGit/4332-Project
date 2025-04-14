@@ -483,5 +483,188 @@ void bookIsAvailable() {
 
 //    OPTION 4)
 
+    @Test
+    void testCheckoutBook() {
+        String memberId = "1";
+        String bookName = "Test Book";
+
+        // Simulated user input: 4 (checkout book), member ID, book name, "", 10 (exit)
+        String userInput = String.join("\n",
+                "4",          // Select option 4: Checkout Book
+                memberId,     // Member ID
+                bookName,     // Book name
+                "",           // Continue
+                "10"          // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was called
+        verify(mockedLibrary).checkoutBook(memberId, bookName);
+    }
+
+    @Test
+    void testCheckoutBook_emptyMemberId_triggersValidation() {
+        // Simulated input: 4 (checkout), then empty string for member ID, then "10" to exit
+        String userInput = String.join("\n",
+                "4",
+                "",            // Empty member ID (should trigger validation)
+                "Book1",   // Won't be read
+                "",            // Continue
+                "10"
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        //Run
+        cli.run();
+
+        // Verify that checkoutBook was never called
+        verify(mockedLibrary, never()).checkoutBook(anyString(), anyString());
+    }
+
+
+    @Test
+    void testCheckoutBook_emptyBookName_triggersValidation() {
+        String userInput = String.join("\n",
+                "4",
+                "1",          // Valid member ID
+                "",           // Empty book name (should trigger validation)
+                "",           // Continue
+                "10"
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        //Run
+        cli.run();
+
+        verify(mockedLibrary, never()).checkoutBook(anyString(), anyString());
+    }
+
+    @Test
+    void testReturnBook() {
+        // Arrange
+        String memberId = "1";
+        String bookName = "Some Book";
+        String resolvedBookID = "B001";
+
+        // Simulated user input: 5 (return), member ID, book name, "", 10 (exit)
+        String userInput = String.join("\n",
+                "5",
+                memberId,
+                bookName,
+                "",     // Continue
+                "10"    // Exit
+        );
+
+        // Mock findBookIdByName to return the correct ID
+        when(mockedLibrary.findBookIdByName(bookName)).thenReturn(resolvedBookID);
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+
+        // Run
+        cli.run();
+
+        verify(mockedLibrary).findBookIdByName(bookName);
+        verify(mockedLibrary).returnBook(memberId, resolvedBookID);
+    }
+
+    @Test
+    void testReturnBook_emptyMemberId_triggersValidation() {
+        String userInput = String.join("\n",
+                "5",
+                "",            // Invalid (empty) member ID
+                "Some Book",
+                "", "10"
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+
+        //Run
+        cli.run();
+
+        verify(mockedLibrary, never()).returnBook(anyString(), anyString());
+    }
+
+    @Test
+    void testReturnBook_emptyBookName_triggersValidation() {
+        String userInput = String.join("\n",
+                "5",
+                "1",           // Valid member ID
+                "",            // Empty book name
+                "", "10"
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        //Run
+        cli.run();
+
+        verify(mockedLibrary, never()).returnBook(anyString(), anyString());
+    }
+
+    @Test
+    void testReturnBook_bookNotFound_triggersGuardClause() {
+        String userInput = String.join("\n",
+                "5",
+                "1",
+                "Nonexistent Book",
+                "", "10"
+        );
+
+        // Book name lookup but, returns null
+        when(mockedLibrary.findBookIdByName("Nonexistent Book")).thenReturn(null);
+
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        //Run
+        cli.run();
+
+        verify(mockedLibrary, never()).returnBook(anyString(), anyString());
+    }
+
+    @Test
+    void testViewAllBooks_withBooks() {
+        // Use a real library so we can control the field
+        Library realLibrary = new Library();
+
+        Book book1 = mock(Book.class);
+        Book book2 = mock(Book.class);
+        when(book1.getBookInfo()).thenReturn("Book 1 Info");
+        when(book2.getBookInfo()).thenReturn("Book 2 Info");
+
+        realLibrary.AllBooksInLibrary.add(book1);
+        realLibrary.AllBooksInLibrary.add(book2);
+
+        String userInput = String.join("\n",
+                "6", "", "10"
+        );
+
+        CLI cli = new CLI(new StringReader(userInput), realLibrary);
+        cli.run();
+
+        verify(book1).getBookInfo();
+        verify(book2).getBookInfo();
+    }
+
+
+    @Test
+    void testViewAllBooks_whenLibraryIsEmpty() {
+        Library realLibrary = new Library();  // AllBooksInLibrary is empty by default
+
+        String userInput = String.join("\n",
+                "6", "", "10"
+        );
+
+        CLI cli = new CLI(new StringReader(userInput), realLibrary);
+        cli.run();
+
+        //Checks to make sure  library is empty
+        assertEquals(0, realLibrary.AllBooksInLibrary.size());
+    }
+
+
+
 
 }

@@ -2,6 +2,7 @@ package CLI.Main;
 
 import CLI.Models.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class CLI {
@@ -256,15 +257,17 @@ public class CLI {
                 }
                 // 9. View All Members
                 case "9": {
-                    if (library.Members == null || library.Members.size() <= 0) {
+                    List<Member> allMembers = library.getAllMembers();
+                    if (allMembers == null || allMembers.size() <= 0) {
                         System.out.println("There are no members of this library");
                         break;
                     }
-                    for (Member member : library.Members) {
-                       member.printMemberInfo();
+                    for (Member member : allMembers) {
+                        member.printMemberInfo();
                     }
                     break;
                 }
+
                 // 10. EXIT
                 case "10": {
                     System.out.println("Goodbye!\n");

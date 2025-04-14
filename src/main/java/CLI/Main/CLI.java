@@ -261,7 +261,7 @@ public class CLI {
                         break;
                     }
                     for (Member member : allMembers) {
-                       member.printMemberInfo();
+                        member.printMemberInfo();
                     }
                     break;
                 }

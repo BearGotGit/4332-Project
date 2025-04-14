@@ -13,3 +13,9 @@ make run
 ```
 
 Or just open the root folder (4332-Project) in IntelliJ and hit the green arrow
+
+To run the tests in IntelliJ:
+ * Open the project at the root 4332-Project in IntelliJ
+ * Right-click on the `test` folder
+   * Click `Run 'All Tests'`
+ * You can also go in each test file and run them with coverage

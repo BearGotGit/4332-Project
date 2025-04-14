@@ -9,6 +9,9 @@ public class CLI {
     Scanner scanner;
     Library library;
 
+    Boolean exit = false;
+    Boolean skip = false;
+
     public CLI(Readable input, Library library) {
         this.scanner = new Scanner(input);
         this.library = library;
@@ -41,9 +44,6 @@ public class CLI {
             
             Enter the number of the option you want to select: """ + " ");
             String option = scanner.nextLine();
-
-            Boolean exit = false;
-            Boolean skip = false;
 
             System.out.println();
 

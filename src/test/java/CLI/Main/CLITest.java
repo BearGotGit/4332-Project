@@ -22,7 +22,6 @@ public class CLITest {
     Library mockedLibrary;
     CLI cli;
 
-//
     @BeforeEach
     public void setup() {
         mockedLibrary = mock(Library.class);
@@ -421,9 +420,9 @@ void bookNotFound() {
 
     }
 
-//    Book is available
-@Test
-void bookIsAvailable() {
+    //    Book is available
+    @Test
+    void bookIsAvailable() {
         when(mockedLibrary.findBookIdByName(anyString())).thenReturn("1");
         when(mockedLibrary.bookAvailability(anyString())).thenReturn(true);
 
@@ -733,7 +732,7 @@ void bookIsAvailable() {
         // Act
         cli.run();
 
-        // Assert that addMember was called correctly and printMemberInfo was called
+        // Assert that revokeMembership was called with the correct ID
         verify(mockedLibrary).revokeMembership(memberID);
     }
 
@@ -765,6 +764,26 @@ void bookIsAvailable() {
 
         // Assert that each member correctly called printMemberInfo
         members.forEach(m -> verify(m).printMemberInfo());
+    }
+
+    @Test
+    void exitTestShouldSucceed() {
+        // Chooses Exit and program exits
+
+        // Arrange
+        // Fake user input: 10 (Exit), then anything to continue
+        String userInput = String.join("\n",
+                "10" // Program should end after exit is requested
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedLibrary);
+
+        // Act
+        cli.run();
+
+        // Assert that Exit was called and set exit to true
+        assertEquals(true, cli.exit);
     }
 
     // Structural test
@@ -812,7 +831,7 @@ void bookIsAvailable() {
         // Act
         cli.run();
 
-        // Assert that addMember was called correctly and printMemberInfo was called
+        // Assert that revokeMembership was never called with empty input
         verify(mockedLibrary, never()).revokeMembership(anyString());
     }
 

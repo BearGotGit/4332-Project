@@ -22,6 +22,21 @@ public class CLI {
 
         String input = "";
 
+//        input = null;
+//        Purchasing purchasing = new Purchasing();
+//        LibraryAccounts libraryAccounts = new LibraryAccounts(purchasing);
+//        Book _book = libraryAccounts.orderNewBook(library, "test", "test", 1, "d", 1);
+//        if (_book != null) {
+//            System.out.println("Book added: " + _book.getBookInfo());
+//        }
+//        else {
+//            System.out.println("Book not too expensive to add");
+//        }
+//
+//        for (int i = 0; i < 100; i++) {
+//            System.out.println(purchasing.getBookPrice(String.valueOf(i)));
+//        }
+
         while (input != null) {
 
             System.out.print("""

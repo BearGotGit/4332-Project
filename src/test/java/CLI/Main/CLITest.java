@@ -20,11 +20,15 @@ import java.util.stream.IntStream;
 
 public class CLITest {
     Library mockedLibrary;
+    LibraryAccounts mockedAccounts;
+    Librarians mockedLibrarians;
     CLI cli;
 
     @BeforeEach
     public void setup() {
         mockedLibrary = mock(Library.class);
+        mockedAccounts = mock(LibraryAccounts.class);
+        mockedLibrarians = mock(Librarians.class);
     }
 
     /* Specification Tests */
@@ -55,7 +59,7 @@ public class CLITest {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Mock that library.addBook() returns a dummy Book
         Book fakeBook = mock(Book.class);
@@ -98,7 +102,7 @@ public class CLITest {
 
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Mock that library.addBook() returns a dummy Book
         when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(null);
@@ -140,7 +144,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -169,7 +173,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -198,7 +202,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -227,7 +231,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -256,7 +260,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -285,7 +289,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -315,7 +319,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -345,7 +349,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -367,7 +371,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -388,7 +392,7 @@ public class CLITest {
                 "10"                    // Exit (after adding book, immediately exit)
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         cli.run();
 
@@ -412,7 +416,7 @@ void bookNotFound() {
                 "",
                 "10");
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         verify(mockedLibrary).findBookIdByName(anyString());
@@ -434,7 +438,7 @@ void bookNotFound() {
                 "",
                 "10");
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         verify(mockedLibrary).findBookIdByName(anyString());
@@ -457,7 +461,7 @@ void bookNotFound() {
                 "",
                 "10");
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         verify(mockedLibrary).findBookIdByName(anyString());
@@ -478,7 +482,7 @@ void bookNotFound() {
                 "",
                 "10");
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
@@ -502,7 +506,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input and mocked library
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Run
         cli.run();
@@ -522,7 +526,7 @@ void bookNotFound() {
                 "10"
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         //Run
         cli.run();
 
@@ -541,7 +545,7 @@ void bookNotFound() {
                 "10"
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         //Run
         cli.run();
 
@@ -567,7 +571,7 @@ void bookNotFound() {
         // Mock findBookIdByName to return the correct ID
         when(mockedLibrary.findBookIdByName(bookName)).thenReturn(resolvedBookID);
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Run
         cli.run();
@@ -585,7 +589,7 @@ void bookNotFound() {
                 "", "10"
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         //Run
         cli.run();
@@ -602,7 +606,7 @@ void bookNotFound() {
                 "", "10"
         );
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         //Run
         cli.run();
 
@@ -621,7 +625,7 @@ void bookNotFound() {
         // Book name lookup but, returns null
         when(mockedLibrary.findBookIdByName("Nonexistent Book")).thenReturn(null);
 
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
         //Run
         cli.run();
 
@@ -645,7 +649,7 @@ void bookNotFound() {
                 "6", "", "10"
         );
 
-        CLI cli = new CLI(new StringReader(userInput), realLibrary);
+        CLI cli = new CLI(new StringReader(userInput), realLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         verify(book1).getBookInfo();
@@ -661,7 +665,7 @@ void bookNotFound() {
                 "6", "", "10"
         );
 
-        CLI cli = new CLI(new StringReader(userInput), realLibrary);
+        CLI cli = new CLI(new StringReader(userInput), realLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
 
         //Checks to make sure  library is empty
@@ -694,7 +698,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Stub that library.addMember() returns a dummy Member
         Member mockedMember = mock(Member.class);
@@ -724,7 +728,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Stub that library.addMember() returns true
         when(mockedLibrary.revokeMembership(anyString())).thenReturn(true);
@@ -754,7 +758,7 @@ void bookNotFound() {
 
         // Create CLI with fake input
         Library mockedLibrary = mock(Library.class); // jqwik cannot use @BeforeEach from junit
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Stub that library.getAllMembers() returns my list of members
         when(mockedLibrary.getAllMembers()).thenReturn(members);
@@ -777,7 +781,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Act
         cli.run();
@@ -803,7 +807,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Act
         cli.run();
@@ -826,7 +830,7 @@ void bookNotFound() {
         );
 
         // Create CLI with fake input
-        cli = new CLI(new StringReader(userInput), mockedLibrary);
+        cli = new CLI(new StringReader(userInput), mockedLibrary, mockedAccounts, mockedLibrarians);
 
         // Act
         cli.run();

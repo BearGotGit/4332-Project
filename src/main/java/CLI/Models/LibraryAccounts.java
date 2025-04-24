@@ -12,9 +12,18 @@ public class LibraryAccounts {
         balance += donation;
     }
 
+//    Increases observability
+    public double getBalance() {
+        return balance;
+    }
+//    Increases controllability
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
     // Returns the salary withdrawn, might be less than input if the balance is less than the salary
     public double withdrawSalary(double salary) {
-        double bal = -1;
+        double bal;
         if (salary >= balance) {
             bal = balance;
             balance = 0;
@@ -23,7 +32,7 @@ public class LibraryAccounts {
             bal = salary;
             balance -= salary;
         }
-        System.out.println("Salary of " + bal + " was withdrawn.");
+        System.out.printf("Salary of $%.2f was withdrawn.%n", bal);
         return bal;
     }
 
@@ -32,10 +41,10 @@ public class LibraryAccounts {
         double price = purchasing.getBookPrice(bookName, author, year, genre, ISBN);
         if (balance >= price) {
             balance -= price;
-            System.out.println("Order for " + bookName + " was placed for $" + price + "!");
+            System.out.printf("Order for \"%s\" was placed for $%.2f!%n", bookName, price);
             return true;
         }
-        System.out.println("Order could NOT be placed for book " + bookName + " with price " + price + ".");
+        System.out.printf("Order could NOT be placed for book \"%s\" with price $%.2f.%n", bookName, price);
         return false;
     }
 }

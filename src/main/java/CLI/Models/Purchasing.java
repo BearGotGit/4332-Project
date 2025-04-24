@@ -4,9 +4,10 @@ import java.util.Random;
 
 public class Purchasing {
 
-    // Uses a hash function to consistently return the same price for each book ID
-    public double getBookPrice(String bookID) {
-        Random rand = new Random(bookID.hashCode()); // Hash is deterministic
+    // Uses a hash function to consistently return the same price for each book
+    public double getBookPrice(String bookName, String author, int year, String genre, int ISBN) {
+        String str = bookName + author + year + genre + ISBN;
+        Random rand = new Random(str.hashCode()); // Hash is deterministic
 
         // Min is 10, so start with 10, then add 0-90$
 
@@ -19,4 +20,5 @@ public class Purchasing {
         // Round to 2 decimal places
         return Math.round(price * 100.0) / 100.0; // between 10 and 100
     }
+
 }

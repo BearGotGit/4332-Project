@@ -22,6 +22,7 @@ public class CLI {
 
         String input = "";
 
+        // Testing
 //        input = null;
 //        Purchasing purchasing = new Purchasing();
 //        LibraryAccounts libraryAccounts = new LibraryAccounts(purchasing);
@@ -30,11 +31,11 @@ public class CLI {
 //            System.out.println("Book added: " + _book.getBookInfo());
 //        }
 //        else {
-//            System.out.println("Book not too expensive to add");
+//            System.out.println("Book is too expensive to add");
 //        }
 //
 //        for (int i = 0; i < 100; i++) {
-//            System.out.println(purchasing.getBookPrice(String.valueOf(i)));
+//            System.out.println(purchasing.getBookPrice("test"+i, "test"+i, i, "d"+i, i));
 //        }
 
         while (input != null) {

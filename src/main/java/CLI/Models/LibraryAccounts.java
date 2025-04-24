@@ -28,16 +28,13 @@ public class LibraryAccounts {
         return bal;
     }
 
+    // Tries to order a new book, fails if the cost is greater than the library account balance
     public Book orderNewBook(Library library, String bookName, String author, int year, String genre, int ISBN) {
-        Book book = library.addBook(bookName, author, year, genre, ISBN);
-        double price = purchasing.getBookPrice(book.BookID);
+        double price = purchasing.getBookPrice(bookName, author, year, genre, ISBN);
         if (balance >= price) {
             balance -= price;
-            return book;
+            return library.addBook(bookName, author, year, genre, ISBN);
         }
-        else {
-            library.removeBook(book.BookID);
-            return null;
-        }
+        return null;
     }
 }

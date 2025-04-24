@@ -65,6 +65,14 @@ public class CLI {
                 // 2. Remove book
                 case "2": {
                     System.out.println("You chose to remove a book");
+                    if (authenticate().authType != Librarians.AuthType.NOT_AUTHORIZED) {
+                        // Only librarians can remove books!
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+
                     System.out.print("Enter book name to remove: ");
                     String book = scanner.nextLine();
                     if (book.isEmpty()) {
@@ -205,6 +213,13 @@ public class CLI {
                 // 7. Add Member
                 case "7": {
                     System.out.println("You chose to add a new member");
+                    if (authenticate().authType == Librarians.AuthType.FULL_TIME) {
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+                    
                     System.out.print("Enter member name: ");
                     String name = scanner.nextLine();
                     if (name == null || name.isEmpty()) {
@@ -231,6 +246,13 @@ public class CLI {
                 // 8. Revoke Membership
                 case "8": {
                     System.out.println("You chose to revoke a membership");
+                    if (authenticate().authType == Librarians.AuthType.FULL_TIME) {
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+
                     System.out.print("Enter member ID to revoke: ");
                     String memberID = scanner.nextLine();
                     if (memberID == null || memberID.isEmpty()) {

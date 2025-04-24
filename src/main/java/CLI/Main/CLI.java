@@ -116,6 +116,10 @@ public class CLI {
                         System.out.println("\nNot a valid ID");
                         break;
                     }
+                    if (library.getAllMembers().stream().noneMatch(m -> m.MemberID.equals(memberID))) {
+                        System.out.println("\nMember with ID " + memberID + " does not exist.");
+                        break;
+                    }
                     System.out.print("Enter book name: ");
                     String bookName = scanner.nextLine();
                     if (bookName == null || bookName.isEmpty()) {
@@ -130,7 +134,6 @@ public class CLI {
 
                         System.out.print("""
                                 
-                                
                                 You have these options:
                                 
                                 1. Order Book
@@ -141,15 +144,18 @@ public class CLI {
 
                         System.out.println();
                         if (checkoutOption.equals("1")) {
-                            if (authenticate().authType == Librarians.AuthType.FULL_TIME) {
+                            AuthResult auth = authenticate();
+                            if (auth.authType == Librarians.AuthType.FULL_TIME) {
                                 System.out.println("\nYou are authorized as a full-time librarian!");
-                                Book book = orderBook();
+                                Book book = orderBook(auth.username, auth.authCode, bookName);
                                 if (book != null) {
                                     System.out.println();
                                     library.checkoutBook(memberID, book.Name);
                                 }
                             }
-                            System.out.println("\nYou failed to authorize as a full-time librarian.");
+                            else {
+                                System.out.println("\nYou failed to authorize as a full-time librarian.");
+                            }
                         }
                         break; // exit switch no matter what
                     }
@@ -362,21 +368,40 @@ public class CLI {
     }
 
     private Book orderBook() {
-        System.out.println("You chose to order a new book");
-        AuthResult auth = authenticate();
-        if (auth.authType == Librarians.AuthType.FULL_TIME) {
-            System.out.println("\nSuccessfully authorized!");
-        } else {
-            System.out.println("\nFailed to authorize.");
-            return null;
+        return orderBook(null, null, null);
+    }
+
+    private Book orderBook(String librarianUsername, String authCode, String bookName) {
+        System.out.println("You chose to order " + (bookName == null ? "a new book" : "the book: " + bookName));
+        AuthResult auth = null;
+        if (librarianUsername == null || librarianUsername.isEmpty() ||
+                authCode == null || authCode.isEmpty()) {
+            auth = authenticate();
+            if (auth.authType == Librarians.AuthType.FULL_TIME) {
+                System.out.println("\nSuccessfully authorized!");
+            } else {
+                System.out.println("\nFailed to authorize.");
+                return null;
+            }
+        }
+        else {
+            auth = new AuthResult(librarianUsername, authCode, librarians.authLibrarian(librarianUsername, authCode));
         }
 
-        System.out.print("Enter book name: ");
-        String name = scanner.nextLine();
-        if (name.isEmpty()) {
-            System.out.println("\nNot a valid name");
-            return null;
+        String name = null;
+        if (bookName == null || bookName.isEmpty()) {
+            System.out.print("Enter book name: ");
+            name = scanner.nextLine();
+            if (name.isEmpty()) {
+                System.out.println("\nNot a valid name");
+                return null;
+            }
         }
+        else {
+            name = bookName;
+            System.out.println("You are ordering the book: " + name);
+        }
+
         System.out.print("Enter author: ");
         String author = scanner.nextLine();
         if (author.isEmpty()) {

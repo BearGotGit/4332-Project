@@ -32,7 +32,7 @@ public class LibraryAccounts {
         double price = purchasing.getBookPrice(bookName, author, year, genre, ISBN);
         if (balance >= price) {
             balance -= price;
-            System.out.println("Order placed for book " + bookName + " with price " + price + "!");
+            System.out.println("Order for " + bookName + " was placed for $" + price + "!");
             return true;
         }
         System.out.println("Order could NOT be placed for book " + bookName + " with price " + price + ".");

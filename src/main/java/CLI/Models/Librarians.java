@@ -10,16 +10,24 @@ public class Librarians {
 
     public Librarians() {
         List<String> librarians = List.of(
-                "Ube",
-                "Wolfeschlegelsteinhausenbergerdorff",
-                "Ottovordemgentschenfelde"
+                "A",
+                "B",
+                "C"
+//                "Ube",
+//                "Wolfeschlegelsteinhausenbergerdorff",
+//                "Ottovordemgentschenfelde"
         );
 
         for (String l : librarians) {
-            authCodes.put(l, makeAuthCode());
+//            authCodes.put(l, makeAuthCode());
             withdraws.put(l, 0.0f);
             purchases.put(l, new ArrayList<>());
         }
+
+//        FIXME: Test
+        authCodes.put("A", "111111");
+        authCodes.put("B", "222222");
+        authCodes.put("C", "333333");
     }
 
     public Boolean authLibrarian (String name, String authTry) {

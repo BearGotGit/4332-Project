@@ -22,6 +22,11 @@ public class Librarians {
         }
     }
 
+    public Boolean authLibrarian (String name, String authTry) {
+        String authActual = authCodes.get(name);
+        return authCodes.containsKey(name) && authTry.equals(authActual);
+    }
+
     private String makeAuthCode() {
         Random rand = new Random();
         String authCode = null;

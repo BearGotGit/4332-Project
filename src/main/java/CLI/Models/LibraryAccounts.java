@@ -8,7 +8,6 @@ public class LibraryAccounts {
         this.purchasing = purchasing;
     }
 
-
     public void depositDonation(double donation) {
         balance += donation;
     }
@@ -29,12 +28,14 @@ public class LibraryAccounts {
     }
 
     // Tries to order a new book, fails if the cost is greater than the library account balance
-    public Book orderNewBook(Library library, String bookName, String author, int year, String genre, int ISBN) {
+    public Boolean orderNewBook(String bookName, String author, int year, String genre, int ISBN) {
         double price = purchasing.getBookPrice(bookName, author, year, genre, ISBN);
         if (balance >= price) {
             balance -= price;
-            return library.addBook(bookName, author, year, genre, ISBN);
+            System.out.println("Order placed for book " + bookName + " with price " + price + "!");
+            return true;
         }
-        return null;
+        System.out.println("Order could NOT be placed for book " + bookName + " with price " + price + ".");
+        return false;
     }
 }

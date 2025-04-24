@@ -8,13 +8,17 @@ import java.util.Scanner;
 public class CLI {
     Scanner scanner;
     Library library;
+    LibraryAccounts libraryAccounts;
+    Librarians librarians;
 
     Boolean exit = false;
     Boolean skip = false;
 
-    public CLI(Readable input, Library library) {
+    public CLI(Readable input, Library library, LibraryAccounts libraryAccounts, Librarians librarians) {
         this.scanner = new Scanner(input);
         this.library = library;
+        this.libraryAccounts = libraryAccounts;
+        this.librarians = librarians;
     }
 
     public void run() {
@@ -22,51 +26,58 @@ public class CLI {
 
         String input = "";
 
-        // Testing
-//        input = null;
-//        Purchasing purchasing = new Purchasing();
-//        LibraryAccounts libraryAccounts = new LibraryAccounts(purchasing);
-//        Book _book = libraryAccounts.orderNewBook(library, "test", "test", 1, "d", 1);
-//        if (_book != null) {
-//            System.out.println("Book added: " + _book.getBookInfo());
-//        }
-//        else {
-//            System.out.println("Book is too expensive to add");
-//        }
-//
-//        for (int i = 0; i < 100; i++) {
-//            System.out.println(purchasing.getBookPrice("test"+i, "test"+i, i, "d"+i, i));
-//        }
-
         while (input != null) {
 
             System.out.print("""
-
-            """+stars+"""
-
-
-            You have these options:
-            
-            1. Add Book
-            2. Remove Book
-            3. Check Book Availability
-            4. Checkout Book
-            5. Return Book
-            6. View All Books
-            7. Add Member
-            8. Revoke Membership
-            9. View All Members
-            10. EXIT
-            
-            Enter the number of the option you want to select: """ + " ");
+                    
+                    """ + stars + """
+                    
+                    
+                    You have these options:
+                    
+                    1. Order Book
+                    2. Remove Book
+                    3. Check Book Availability
+                    4. Checkout Book TODO (add ordering book if not in library)
+                    5. Return Book
+                    6. View All Books
+                    7. Add Member
+                    8. Revoke Membership
+                    9. View All Members
+                    10. Hire Part-Time Librarian TODO
+                    11. Withdraw Salary
+                    12. Donate to Library
+                    13. EXIT
+                    
+                    Enter the number of the option you want to select: """ + " ");
             String option = scanner.nextLine();
 
             System.out.println();
 
             switch (option) {
-                // 1. Add book
+                // 1. Order book
                 case "1": {
-                    System.out.println("You chose to add a new book");
+                    System.out.println("You chose to order a new book");
+                    System.out.print("Enter your librarian username: ");
+                    String username = scanner.nextLine();
+                    if (username.isEmpty()) {
+                        System.out.println("\nNot a valid username");
+                        break;
+                    }
+                    System.out.print("Enter your auth code: ");
+                    String authCode = scanner.nextLine();
+                    if (authCode.isEmpty()) {
+                        System.out.println("\nNot a valid authCode");
+                        break;
+                    }
+                    Boolean authSuccess = librarians.authLibrarian(username, authCode);
+                    if (authSuccess) {
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+
                     System.out.print("Enter book name: ");
                     String name = scanner.nextLine();
                     if (name.isEmpty()) {
@@ -113,8 +124,15 @@ public class CLI {
                     }
                     System.out.println();
 
-                    Book newBook = library.addBook(name, author, year, genre, isbn);
-                    if (newBook == null) { break; }
+                    Boolean bookSucccess = libraryAccounts.orderNewBook(name, author, year, genre, isbn);
+                    Book newBook = null;
+                    if (bookSucccess) {
+                        newBook = library.addBook(name, author, year, genre, isbn);
+                        if (newBook == null) { break; }
+                        librarians.librarianPurchasedBook(username, authCode, newBook);
+                    } else {
+                        break;
+                    }
 
                     System.out.println("Successfully added a new book!");
                     System.out.println(newBook.getBookInfo());
@@ -131,7 +149,7 @@ public class CLI {
                         break;
                     }
                     String bookID = library.findBookIdByName(book);
-                    if (bookID == null) { 
+                    if (bookID == null) {
                         System.out.println("Couldn't find book " + book + ".");
                         break;
                     }
@@ -155,13 +173,12 @@ public class CLI {
                         System.out.println("\nCouldn't find book " + book + ".");
                         break;
                     }
-                
+
                     boolean available = library.bookAvailability(bookID);
                     if (available) {
                         System.out.println("\nBook " + book + " is available to checkout!");
                         break;
-                    }
-                    else {
+                    } else {
                         System.out.println("\nBook " + book + " is not available to checkout.");
                     }
                     break;
@@ -204,7 +221,7 @@ public class CLI {
                         break;
                     }
                     String bookID = library.findBookIdByName(book);
-                    if (bookID == null) { 
+                    if (bookID == null) {
                         System.out.println("Couldn't find book " + book + ".");
                         break;
                     }
@@ -281,14 +298,90 @@ public class CLI {
                     }
                     break;
                 }
-                // 10. EXIT
-                case "10": {
+
+                // 11. Withdraw Salary
+                case "11": {
+                    System.out.println("You chose to withdraw your salary");
+                    System.out.print("Enter your librarian username: ");
+                    String username = scanner.nextLine();
+                    if (username.isEmpty()) {
+                        System.out.println("\nNot a valid username");
+                        break;
+                    }
+                    System.out.print("Enter your auth code: ");
+                    String authCode = scanner.nextLine();
+                    if (authCode.isEmpty()) {
+                        System.out.println("\nNot a valid authCode");
+                        break;
+                    }
+                    Boolean authSuccess = librarians.authLibrarian(username, authCode);
+                    if (authSuccess) {
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+
+                    Double expectedSalary = librarians.getSalary(username, authCode);
+                    if (expectedSalary == null) {
+                        System.out.println("Salary couldn't be found.");
+                        break;
+                    }
+                    double salary = libraryAccounts.withdrawSalary(expectedSalary);
+                    if (salary < expectedSalary) {
+                        System.out.println("Salary: $" + salary + " is less than expected: $" + expectedSalary);
+                    }
+                    librarians.librarianWithdrewSalary(username, authCode, salary);
+                }
+                // 12. Donate to Library
+                case "12": {
+                    System.out.println("You chose to donate to the library");
+                    System.out.print("Enter your librarian username: ");
+                    String username = scanner.nextLine();
+                    if (username.isEmpty()) {
+                        System.out.println("\nNot a valid username");
+                        break;
+                    }
+                    System.out.print("Enter your auth code: ");
+                    String authCode = scanner.nextLine();
+                    if (authCode.isEmpty()) {
+                        System.out.println("\nNot a valid authCode");
+                        break;
+                    }
+                    Boolean authSuccess = librarians.authLibrarian(username, authCode);
+                    if (authSuccess) {
+                        System.out.println("\nSuccessfully authorized!");
+                    } else {
+                        System.out.println("\nFailed to authorize.");
+                        break;
+                    }
+
+                    System.out.print("How much would you like to donate?: ");
+                    String donationStr = scanner.nextLine();
+                    if (donationStr.isEmpty()) {
+                        System.out.println("\nNot a valid donation");
+                        break;
+                    }
+                    double donation = -1;
+                    try {
+                        donation = Double.parseDouble(donationStr);
+                    } catch (Exception e) {
+                        System.out.println("Donation " + donationStr + "must be a number.");
+                        break;
+                    }
+
+                    libraryAccounts.depositDonation(donation);
+
+                    System.out.println("Thank you for donating $" + donation + "!");
+                }
+                // 13. EXIT
+                case "13": {
                     System.out.println("Goodbye!\n");
                     exit = true;
                     break;
                 }
                 default: {
-                // ?. Handle bad option
+                    // ?. Handle bad option
                     skip = true;
                     System.out.println("Invalid option");
                 }

@@ -389,8 +389,8 @@ public class CLI {
         return new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
     }
 
-    private Book orderBook() {
-        return orderBook(null, null, null);
+    private void orderBook() {
+        orderBook(null, null, null);
     }
 
     private Book orderBook(String librarianUsername, String authCode, String bookName) {

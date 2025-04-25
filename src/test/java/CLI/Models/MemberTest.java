@@ -1,7 +1,7 @@
 package CLI.Models;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import net.jqwik.api.lifecycle.*;
+import org.junit.jupiter.api.*;
 import net.jqwik.api.*;
 import net.jqwik.api.constraints.*;
 import java.util.*;
@@ -19,7 +19,7 @@ public class MemberTest {
     private final String email = "emailTest";
     private final String ID  = "1";
 
-    @BeforeEach
+    @BeforeEach @BeforeTry
     void setUp() {
         member = new Member(name, email, ID);
     }
@@ -80,7 +80,6 @@ public class MemberTest {
         // For any list of borrowed books, getBorrowedBookList() should return the expected list
 
         // Arrange
-        Member member = new Member(name, email, ID);
         member.BorrowedBookList = new ArrayList<>(bookIDs);
         List<String> expectedBorrowedBookList = new ArrayList<>(bookIDs);
 
@@ -100,7 +99,6 @@ public class MemberTest {
         // addBorrowedBook() should add the bookID because it doesn't contain it yet.
 
         // Arrange
-        Member member = new Member(name, email, ID);
         member.BorrowedBookList = new ArrayList<>(bookIDs); // Does NOT include bookID
         List<String> expectedBorrowedBookList = new ArrayList<>(bookIDs);
         expectedBorrowedBookList.add(newBookID);
@@ -121,7 +119,6 @@ public class MemberTest {
         // addBorrowedBook() should NOT add the duplicate bookID because it is already in the list.
 
         // Arrange
-        Member member = new Member(name, email, ID);
         List<String> expectedBorrowedBookList = new ArrayList<>(bookIDs);
         expectedBorrowedBookList.add(newBookID);
         member.BorrowedBookList = new ArrayList<>(expectedBorrowedBookList); // Includes bookID
@@ -142,7 +139,6 @@ public class MemberTest {
         // removeBorrowedBook() should remove the bookID because it exists in the list.
 
         // Arrange
-        Member member = new Member(name, email, ID);
         member.BorrowedBookList = new ArrayList<>(bookIDs);
         member.BorrowedBookList.add(newBookID); // Now has the bookID
 
@@ -162,7 +158,6 @@ public class MemberTest {
         // removeBorrowedBook() should do nothing because the bookID is not in the list.
 
         // Arrange
-        Member member = new Member(name, email, ID);
         member.BorrowedBookList = new ArrayList<>(bookIDs);
 
         // Act

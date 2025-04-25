@@ -1,20 +1,27 @@
 package CLI.Models;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import net.jqwik.api.*;
-import org.junit.jupiter.api.Test;
+import net.jqwik.api.lifecycle.BeforeTry;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class PurchasingTest {
 
+    Purchasing purchasing;
+
+    @BeforeEach @BeforeTry
+    void setUp() {
+        purchasing = new Purchasing();
+    }
+
+    // Specification Tests
     @Test
     public void testGetBookPriceTheSame() {
-        Purchasing purchasing = new Purchasing();
-
         // Making sure the same book details give the same price each time
         double exampleBookPrice1 = purchasing.getBookPrice("The Great Gatsby", "F. Scott Fitzgerald", 1925, "Fiction", 12345);
         double exampleBookPrice2 = purchasing.getBookPrice("The Great Gatsby", "F. Scott Fitzgerald", 1925, "Fiction", 12345);
@@ -22,25 +29,8 @@ public class PurchasingTest {
         assertEquals(exampleBookPrice1, exampleBookPrice2, "The same book parameters should return the consistent price");
     }
 
-    @Property
-    public void testGetBookPriceTheSame(@ForAll("bookGenerator") List<Book> books) {
-
-        // Deep copy
-        List<Book> books2 = books.stream().map(b -> new Book(b.Name, b.Author, b.Year, b.Genre, b.ISBN, b.BookID)).toList();
-
-        Purchasing purchasing = new Purchasing();
-
-        // Making sure the same book details give the same price each time
-        List<Double> prices = books.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
-        List<Double> prices2 = books2.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
-
-        assertEquals(prices.toString(), prices2.toString(), "The same book parameters should return the consistent price");
-    }
-
     @Test
     public void testGetBookPriceBounds() {
-        Purchasing purchasing = new Purchasing();
-
         // Let's try a few different books to check the price limits
         double exampleBookPrice1 = purchasing.getBookPrice("The Great Gatsby", "F. Scott Fitzgerald", 1925, "Fiction", 12345);
         double exampleBookPrice2 = purchasing.getBookPrice("To Kill a Mockingbird", "Harper Lee", 1960, "Fiction", 23456);
@@ -57,10 +47,33 @@ public class PurchasingTest {
         assertEquals(true, exampleBookPrice3 <= 100.0, "Book price should be at most $100");
     }
 
+    @Test
+    public void testGetBookPriceDecimalPlaces() {
+        double exampleBookPrice = purchasing.getBookPrice("The Hobbit", "J.R.R. Tolkien", 1937, "Fantasy", 45678);
+
+        // Checking if we're getting proper prices with cents (2 decimal places)
+        double roundedPrice = Math.round(exampleBookPrice * 100.0) / 100.0;
+        assertEquals(exampleBookPrice, roundedPrice, "Price should be rounded to 2 decimal places");
+    }
+
+    // Property Tests
+
+    @Property
+    public void testGetBookPriceTheSame(@ForAll("bookGenerator") List<Book> books) {
+
+        // Deep copy
+        List<Book> books2 = books.stream().map(b -> new Book(b.Name, b.Author, b.Year, b.Genre, b.ISBN, b.BookID)).toList();
+
+        // Making sure the same book details give the same price each time
+        List<Double> prices = books.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
+        List<Double> prices2 = books2.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
+
+        assertEquals(prices.toString(), prices2.toString(), "The same book parameters should return the consistent price");
+    }
+
     @Property
     public void testGetBookPriceBounds(@ForAll("bookGenerator") List<Book> books) {
 
-        Purchasing purchasing = new Purchasing();
         List<Double> prices = books.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
 
         prices.forEach(price -> {
@@ -72,20 +85,8 @@ public class PurchasingTest {
         });
     }
 
-    @Test
-    public void testGetBookPriceDecimalPlaces() {
-        Purchasing purchasing = new Purchasing();
-
-        double exampleBookPrice = purchasing.getBookPrice("The Hobbit", "J.R.R. Tolkien", 1937, "Fantasy", 45678);
-
-        // Checking if we're getting proper prices with cents (2 decimal places)
-        double roundedPrice = Math.round(exampleBookPrice * 100.0) / 100.0;
-        assertEquals(exampleBookPrice, roundedPrice, "Price should be rounded to 2 decimal places");
-    }
-
     @Property
     public void testGetBookPriceDecimalPlaces(@ForAll("bookGenerator") List<Book> books) {
-        Purchasing purchasing = new Purchasing();
 
         List<Double> prices = books.stream().map(b -> purchasing.getBookPrice(b.Name, b.Author, b.Year, b.Genre, b.ISBN)).toList();
 

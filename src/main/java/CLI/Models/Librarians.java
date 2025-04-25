@@ -1,33 +1,33 @@
 package CLI.Models;
 
+import CLI.Helpers.AuthCodeAndSalary;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Librarians {
 
     private Map<String, String> authCodes = new HashMap<>();
-    private Map<String, Double> withdraws = new HashMap<>();
-    private Map<String, List<Book>> purchases = new HashMap<>();
 
-    public Librarians() {
-        List<String> librarians = List.of(
-                "A",
-                "B",
-                "C"
-//                "Ube",
-//                "Wolfeschlegelsteinhausenbergerdorff",
-//                "Ottovordemgentschenfelde"
-        );
+    // Package level so tests can see them
+    Map<String, Double> withdraws = new HashMap<>();
+    Map<String, List<Book>> purchases = new HashMap<>();
+    Map<String, Double> salaries = new HashMap<>();
 
-        for (String l : librarians) {
-//            authCodes.put(l, makeAuthCode());
-            withdraws.put(l, 0.0);
-            purchases.put(l, new ArrayList<>());
+    public Librarians(Map<String, AuthCodeAndSalary> librarians) {
+        for (String librarian : librarians.keySet()) {
+            withdraws.put(librarian, 0.0);
+            purchases.put(librarian, new ArrayList<>());
+            salaries.put(librarian, librarians.get(librarian).salary);
         }
 
-//        FIXME: Test
-        authCodes.put("A", "111111");
-        authCodes.put("B", "222222");
-        authCodes.put("C", "333333");
+        this.authCodes.putAll(
+            librarians.entrySet().stream()
+                .collect(Collectors.toMap(
+                    e -> e.getKey(),
+                    e -> e.getValue().authCode
+                ))
+        );
     }
 
     public enum AuthType {
@@ -48,6 +48,10 @@ public class Librarians {
             System.out.println("Failed to authorize");
             return;
         }
+        if (authCodes.containsKey(newUsername)) {
+            System.out.println("Librarian already exists!");
+            return;
+        }
         authCodes.put(newUsername, null); // no auth code for part-time
         System.out.println("New part-time librarian: " + newUsername + " has been hired!");
     }
@@ -65,9 +69,10 @@ public class Librarians {
             System.out.println("Failed to authorize");
             return null;
         }
-        return withdraws.getOrDefault(username, 0.0);
+        return salaries.getOrDefault(username, 0.0);
     }
 
+    // Has to take in salary parameter because the library accounts might not hav the full salary in the bank
     public void librarianWithdrewSalary(String username, String authTry, double salary) {
         if (authLibrarian(username, authTry) != AuthType.FULL_TIME) {
             System.out.println("Failed to authorize");
@@ -76,16 +81,4 @@ public class Librarians {
         double currSalary = withdraws.getOrDefault(username, 0.0);
         withdraws.put(username, currSalary+salary);
     }
-
-//    private String makeAuthCode() {
-//        Random rand = new Random();
-//        String authCode = null;
-//        while (authCode == null) {
-//            authCode = rand.ints(6, 0,10).toString();
-//            if (authCodes.containsValue(authCode)) {
-//                authCode = null;
-//            }
-//        }
-//        return authCode;
-//    }
 }

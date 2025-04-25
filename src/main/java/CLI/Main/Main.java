@@ -7,6 +7,7 @@ import CLI.Models.LibraryAccounts;
 import CLI.Models.Purchasing;
 
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Map;
 
 public class Main {
@@ -21,6 +22,7 @@ public class Main {
 
         CLI cli = new CLI(
                 new InputStreamReader(System.in),
+                new PrintStream(System.out),
                 new Library(),
                 new LibraryAccounts(purchasing),
                 new Librarians(fullTimeLibrarians)

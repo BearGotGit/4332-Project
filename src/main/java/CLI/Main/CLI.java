@@ -123,7 +123,7 @@ public class CLI {
                     outStream.println("You chose to checkout a new book");
                     outStream.print("Enter your member ID: ");
                     String memberID = scanner.nextLine();
-                    if (memberID == null || memberID.isBlank()) {
+                    if (memberID.isBlank()) {
                         outStream.println("\nNot a valid ID");
                         break;
                     }
@@ -133,7 +133,7 @@ public class CLI {
                     }
                     outStream.print("Enter book name: ");
                     String bookName = scanner.nextLine();
-                    if (bookName == null || bookName.isBlank()) {
+                    if (bookName.isBlank()) {
                         outStream.println("\nNot a valid book name");
                         break;
                     }
@@ -159,13 +159,13 @@ public class CLI {
                             if (auth.authType == Librarians.AuthType.FULL_TIME) {
                                 outStream.println("\nYou are authorized as a full-time librarian!");
                                 Book book = orderBook(auth.username, auth.authCode, bookName);
-                                if (book != null) {
-                                    outStream.println();
-                                    library.checkoutBook(memberID, book.Name);
-                                }
+                                if (book == null) break;
+                                outStream.println();
+                                library.checkoutBook(memberID, book.Name);
                             }
                             else {
                                 outStream.println("\nYou failed to authorize as a full-time librarian.");
+                                break;
                             }
                         }
                         break; // exit switch no matter what
@@ -181,13 +181,13 @@ public class CLI {
                     outStream.println("You chose to return a book");
                     outStream.print("Enter your member ID: ");
                     String memberID = scanner.nextLine();
-                    if (memberID == null || memberID.isBlank()) {
+                    if (memberID.isBlank()) {
                         outStream.println("\nNot a valid ID");
                         break;
                     }
                     outStream.print("Enter book name: ");
                     String book = scanner.nextLine();
-                    if (book == null || book.isBlank()) {
+                    if (book.isBlank()) {
                         outStream.println("\nNot a valid book name");
                         break;
                     }
@@ -472,10 +472,11 @@ public class CLI {
             if (newBook == null) { return null; }
             librarians.librarianPurchasedBook(auth.username, auth.authCode, newBook);
         } else {
+            outStream.println("Failed to order book: " + name + ".");
             return null;
         }
 
-        outStream.println("Successfully added a new book!");
+        outStream.println("Successfully ordered book: " + name + "!");
         outStream.println(newBook.getBookInfo());
         return newBook;
     }

@@ -97,6 +97,23 @@ public class CLITest {
 
     //    OPTION 1: Order Book
 
+    @Test
+    void testOrderBookAuthFails() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = "";
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        Book book = cli.orderBook(testLibrarianUser, "Incorrect auth code", null);
+
+        assertNull(book);
+    }
+
     //    Book not in library yet; add it (happy case)
     @Test
     void testOrderBook() {
@@ -294,27 +311,239 @@ public class CLITest {
     //    OPTION 4: Checkout Book
 
     @Test
-    void testCheckoutBook() {
-        String memberId = "1";
+    void testCheckoutBookWhenBookExists() {
+        // checkoutBook() should be called correctly
+
+        String memberID = "1";
         String bookName = "Test Book";
 
-        // Simulated user input: 4 (checkout book), member ID, book name, "", 10 (exit)
+        // Simulated user input
         String userInput = String.join("\n",
                 "4",          // Select option 4 (Checkout Book)
-                memberId,     // Member ID
-                bookName,     // Book name
-                "",           // Continue
-                this.cliExitOption          // Exit
+                memberID,
+                bookName,
+                "",
+                this.cliExitOption  // Exit
         );
 
         // Create CLI with fake input and mocked library
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn("1");
+
         // Run
         cli.run();
 
         // Verify that the library's checkoutBook method was called
-        verify(mockedLibrary).checkoutBook(memberId, bookName);
+        verify(mockedLibrary).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenMemberDoesNotExist() {
+        // checkoutBook() should never be called
+
+        String memberID = "1";
+        String bookName = "Test Book";
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of());
+
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn("1");
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was Never called
+        verify(mockedLibrary, never()).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenBookIsNotAvailable() {
+        // orderBook() and checkoutBook() should be called correctly
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "1", // Order Book
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        // orderBook() mocks
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(true);
+        Book book = new Book(bookName, author, year, genre, ISBN, "1");
+        when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(book);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was called
+        verify(mockedLibrary).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenBookIsNotAvailableOrderFails() {
+        // orderBook() fails
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "1", // Order Book
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        // orderBook() mocks
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(false);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was Never called
+        verify(mockedLibrary, never()).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenBookIsNotAvailableCanceled() {
+        // checkoutBook() should be never be called
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "2", // Cancel
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was Never called
+        verify(mockedLibrary, never()).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenBookIsNotAvailableAndAuthFails() {
+        // checkoutBook() should be never be called
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "1", // Order Book
+                testLibrarianUser,
+                "Incorrect Auth Code",
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was Never called
+        verify(mockedLibrary, never()).checkoutBook(memberID, bookName);
     }
 
     //    OPTION 5: Return Book
@@ -595,6 +824,117 @@ public class CLITest {
     }
 
     //    OPTION 1: Order Book
+
+    @Test
+    void testOrderBookNullUsername() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                "",
+                testLibrarianAuthCode,
+                ""
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        Book book = cli.orderBook(null, testLibrarianAuthCode, null);
+
+        assertNull(book);
+    }
+
+    @Test
+    void testOrderBookNullAuthCode() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                testLibrarianUser,
+                "",
+                ""
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        Book book = cli.orderBook(testLibrarianUser, null, null);
+
+        assertNull(book);
+    }
+
+    @Test
+    void testOrderBookBlankUsername() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                "",
+                testLibrarianAuthCode,
+                ""
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        Book book = cli.orderBook("", testLibrarianAuthCode, null);
+
+        assertNull(book);
+    }
+
+    @Test
+    void testOrderBookBlankAuthCode() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                testLibrarianUser,
+                "",
+                ""
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        // Run
+        Book book = cli.orderBook(testLibrarianUser, "", null);
+
+        assertNull(book);
+    }
+
+    @Test
+    void testOrderBookBlankBookName() {
+        // orderBook() should return null
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                ""
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        // Run
+        Book book = cli.orderBook(testLibrarianUser, testLibrarianAuthCode, "");
+
+        assertNull(book);
+    }
 
     //    Empty field (bookName)
     @Test
@@ -892,15 +1232,18 @@ public class CLITest {
 
     @Test
     void testCheckoutBook_emptyBookName_triggersValidation() {
+        String memberID = "1";
         String userInput = String.join("\n",
                 "4",
-                "1",          // Valid member ID
+                memberID,          // Valid member ID
                 "",           // Empty book name (should trigger validation)
                 "",           // Continue
                 this.cliExitOption
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+
         //Run
         cli.run();
 

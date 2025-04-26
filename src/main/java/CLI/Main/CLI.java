@@ -355,7 +355,7 @@ public class CLI {
                     outStream.println("Thank you for donating $" + donation + "!");
                 }
                 // 13. EXIT
-                case "13": {
+                case "13", "x", "X": {
                     outStream.println("Goodbye!\n");
                     exit = true;
                     break;
@@ -376,7 +376,7 @@ public class CLI {
         scanner.close();
     }
 
-    public AuthResult authenticate() {
+    AuthResult authenticate() {
         outStream.print("Enter your librarian username: ");
         String username = scanner.nextLine();
         if (username.isBlank()) {
@@ -389,25 +389,26 @@ public class CLI {
         return new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
     }
 
-    private void orderBook() {
+     void orderBook() {
         orderBook(null, null, null);
     }
 
-    private Book orderBook(String librarianUsername, String authCode, String bookName) {
+    Book orderBook(String librarianUsername, String authCode, String bookName) {
         outStream.println("You chose to order " + (bookName == null ? "a new book" : "the book: " + bookName));
         AuthResult auth = null;
         if (librarianUsername == null || librarianUsername.isBlank() ||
-                authCode == null || authCode.isBlank()) {
+            authCode == null || authCode.isBlank()
+        ) {
             auth = authenticate();
-            if (auth.authType == Librarians.AuthType.FULL_TIME) {
-                outStream.println("\nSuccessfully authorized!");
-            } else {
-                outStream.println("\nFailed to authorize.");
-                return null;
-            }
         }
         else {
             auth = new AuthResult(librarianUsername, authCode, librarians.authLibrarian(librarianUsername, authCode));
+        }
+        if (auth.authType == Librarians.AuthType.FULL_TIME) {
+            outStream.println("\nSuccessfully authorized!");
+        } else {
+            outStream.println("\nFailed to authorize.");
+            return null;
         }
 
         String name = null;
@@ -464,9 +465,9 @@ public class CLI {
         }
         outStream.println();
 
-        Boolean bookSucccess = libraryAccounts.orderNewBook(name, author, year, genre, isbn);
+        Boolean bookSuccess = libraryAccounts.orderNewBook(name, author, year, genre, isbn);
         Book newBook = null;
-        if (bookSucccess) {
+        if (bookSuccess) {
             newBook = library.addBook(name, author, year, genre, isbn);
             if (newBook == null) { return null; }
             librarians.librarianPurchasedBook(auth.username, auth.authCode, newBook);
@@ -485,7 +486,6 @@ public class CLI {
         public Librarians.AuthType authType;
 
         public AuthResult(String username, String authCode, Librarians.AuthType authType) {
-//            System.out.println("Auth result: " + username + ", " + authCode + ", " + authType);
             this.username = username;
             this.authCode = authCode;
             this.authType = authType;

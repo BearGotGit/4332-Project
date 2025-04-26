@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 
 import CLI.Models.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.List;
@@ -74,37 +75,56 @@ public class CLITest {
         CLI.AuthResult authResult = cli.authenticate();
 
         assertEquals(Librarians.AuthType.PART_TIME, authResult.authType);
-//        verify(mockedLibrarians, never()).authLibrarian(anyString(), anyString());
+    }
+
+    @Test
+    void authenticateTestShouldBeNotAuthorized() {
+        // authenticate() should return NOT_AUTHORIZED
+
+        String userInput = String.join("\n",
+                testLibrarianUser,
+                "incorrect auth code",
+                ""
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.NOT_AUTHORIZED, authResult.authType);
     }
 
     //    OPTION 1: Order Book
 
     //    Book not in library yet; add it (happy case)
     @Test
-    void testAddBook() {
-//       Qualities of book
+    void testOrderBook() {
         String bookName = "My Book";
         String author = "Jane Doe";
         int year = 2024;
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
         // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(true);
 
-        // Mock that library.addBook() returns a dummy Book
         Book fakeBook = mock(Book.class);
         when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(fakeBook);
 
@@ -112,55 +132,44 @@ public class CLITest {
         cli.run();
 
         // Verify that addBook was called correctly
-        verify(mockedLibrary).addBook(
-                bookName,
-                author,
-                year,
-                genre,
-                isbn
-        );
+        verify(mockedLibrary).addBook(bookName, author, year, genre, ISBN);
     }
 
     //    Book in library already or otherwise library can't make book
     @Test
     void testAddBookCantMake() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "Jane Doe";
         int year = 2024;
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
-
 
         // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(true);
 
-        // Mock that library.addBook() returns a dummy Book
         when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(null);
 
         // Run
         cli.run();
 
         // Verify that addBook was called correctly
-        verify(mockedLibrary).addBook(
-                bookName,
-                author,
-                year,
-                genre,
-                isbn
-        );
+        verify(mockedLibrary).addBook(bookName, author, year, genre, ISBN);
     }
 
     //    OPTION 2: Remove Book
@@ -569,7 +578,7 @@ public class CLITest {
     // Auth
 
     @Test
-    void authenticateTestShouldBeFail() {
+    void authenticateTestShouldFail() {
         // authenticate() should return NOT_AUTHORIZED
 
         String userInput = String.join("\n",
@@ -590,56 +599,64 @@ public class CLITest {
     //    Empty field (bookName)
     @Test
     void emptyBookName() {
-        //       Qualities of book
         String bookName = "";
         String author = "Jane Doe";
         int year = 2024;
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
     }
 
-    //    Empty field (author)
+    //    Empty field (autho)
     @Test
     void emptyAuthor() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "";
         int year = 2024;
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
@@ -648,27 +665,31 @@ public class CLITest {
     //    Empty field (year)
     @Test
     void emptyYear() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "Jane Doe";
         String year = "";
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                year,           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                year,
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
@@ -677,27 +698,31 @@ public class CLITest {
     //    Bad field (year)
     @Test
     void badYear() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "Jane Doe";
-        String year = "bad";
+        String year = "not a number";
         String genre = "Fiction";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                year,           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                year,
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
@@ -706,56 +731,31 @@ public class CLITest {
     //    Empty field (genre)
     @Test
     void emptyGenre() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "Jane Doe";
         int year = 2024;
         String genre = "";
-        int isbn = 123456;
+        int ISBN = 123456;
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                String.valueOf(isbn),         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
-        cli.run();
-
-        verifyNoInteractions(mockedLibrary);
-    }
-
-    //    Bad field (isbn)
-    @Test
-    void badIsbn() {
-        //       Qualities of book
-        String bookName = "My Book";
-        String author = "Jane Doe";
-        int year = 2024;
-        String genre = "Fiction";
-        String isbn = "bad";
-
-        // Fake user input: 1 (add book), then book fields, then anything to continue
-        String userInput = String.join("\n",
-                "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                isbn,         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
-        );
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);
@@ -764,27 +764,64 @@ public class CLITest {
     //    Empty field (isbn)
     @Test
     void emptyIsbn() {
-        //       Qualities of book
         String bookName = "My Book";
         String author = "Jane Doe";
         int year = 2024;
         String genre = "Fiction";
-        String isbn = "";
+        String ISBN = "";
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "1",              // Select option 1 (Add Book)
-                bookName,               // Book name
-                author,                 // Author
-                String.valueOf(year),           // Year
-                genre,                  // Genre
-                isbn,         // ISBN
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                ISBN,
+                "",
+                this.cliExitOption
         );
 
+        // Create CLI with fake input
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        // Run
+        cli.run();
+
+        verifyNoInteractions(mockedLibrary);
+    }
+
+    //    Bad field (isbn)
+    @Test
+    void badIsbn() {
+        String bookName = "My Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        String ISBN = "not a number";
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "1",              // Select option 1 (Add Book)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                author,
+                String.valueOf(year),
+                genre,
+                ISBN,
+                "",
+                this.cliExitOption
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        // Run
         cli.run();
 
         verifyNoInteractions(mockedLibrary);

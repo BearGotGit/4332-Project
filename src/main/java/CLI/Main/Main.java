@@ -22,7 +22,7 @@ public class Main {
 
         CLI cli = new CLI(
                 new InputStreamReader(System.in),
-                new PrintStream(System.out),
+                new PrintStream(System.out, true),
                 new Library(),
                 new LibraryAccounts(purchasing),
                 new Librarians(fullTimeLibrarians)

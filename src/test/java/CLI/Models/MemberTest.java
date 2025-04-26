@@ -92,8 +92,8 @@ public class MemberTest {
     }
 
     @Property
-    void addBorrowedBookTestWhenBookDoesntExist(@ForAll @Size(min = 0, max = 20) List<@StringLength(min = 1, max = 10) String> bookIDs,
-                                                @ForAll @StringLength(min = 1, max = 10) String newBookID) {
+    void addBorrowedBookTestWhenBookDoesntExist(@ForAll @Size(min = 0, max = 20) List<@AlphaChars @NumericChars @StringLength(min = 1, max = 10) String> bookIDs,
+                                                @ForAll @AlphaChars @NumericChars @StringLength(min = 1, max = 10) String newBookID) {
         Assume.that(!bookIDs.contains(newBookID)); // ignore case when it's already there
 
         // addBorrowedBook() should add the bookID because it doesn't contain it yet.
@@ -132,8 +132,8 @@ public class MemberTest {
     }
 
     @Property
-    void removeBorrowedBookTestWhenBookExists(@ForAll @Size(min = 0, max = 20) List<@StringLength(min = 1, max = 10) String> bookIDs,
-                                              @ForAll @StringLength(min = 1, max = 10) String newBookID) {
+    void removeBorrowedBookTestWhenBookExists(@ForAll @Size(min = 0, max = 20) List<@AlphaChars @NumericChars @StringLength(min = 1, max = 10) String> bookIDs,
+                                              @ForAll @AlphaChars @NumericChars @StringLength(min = 1, max = 10) String newBookID) {
         Assume.that(!bookIDs.contains(newBookID)); // ignore case when it's already there
 
         // removeBorrowedBook() should remove the bookID because it exists in the list.

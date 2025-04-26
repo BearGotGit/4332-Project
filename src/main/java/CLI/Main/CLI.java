@@ -4,7 +4,6 @@ import CLI.Models.*;
 
 import java.io.PrintStream;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class CLI {

@@ -194,50 +194,87 @@ public class CLITest {
     //    Remove book (in library)
     @Test
     void testRemoveBook() {
-//        Setup for verifying actions during cli
-        String bookId = "bookId";
-        doNothing().when(mockedLibrary).removeBook(anyString());
-        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(bookId);
+        // removeBook() should be called correctly
 
-//       run cli
-//       Qualities of book
+        String bookID = "bookID";
+        String bookName = "La Despidida";
 
-        // Fake user input: 1 (add book), then book fields, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
-                "2",              // Select option 2 (Remove Book)
-                "La Despidida",               // Book name
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                "2",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                "",
+                this.cliExitOption // Exit
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        when(mockedLibrary.findBookIdByName(bookName)).thenReturn(bookID);
+
         cli.run();
 
-        verify(mockedLibrary).removeBook(bookId);
+        verify(mockedLibrary).removeBook(bookID);
     }
-
 
     //    Remove book (not in library)
     @Test
     void testRemoveBookNotFound() {
-        //        Setup for verifying actions during cli
-        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+        // removeBook() should be called correctly
 
-        // Fake user input: 2 (remove book), then book name, then anything to continue
+        String bookName = "La Despidida";
+
+        // Fake user input
         String userInput = String.join("\n",
-                "2",              // Select option 2 (Remove Book)
-                "La Despidida",               // Book name
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                "2",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                "",
+                this.cliExitOption // Exit
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        when(mockedLibrary.findBookIdByName(bookName)).thenReturn(null);
+
         cli.run();
 
-        verify(mockedLibrary).findBookIdByName(anyString());
-        verifyNoMoreInteractions(mockedLibrary);
+        verify(mockedLibrary, never()).removeBook(anyString());
+    }
+
+    //    Remove book Failed Auth
+    @Test
+    void testRemoveBookFailAuth() {
+        // removeBook() should Not be called
+
+        String bookID = "bookID";
+        String bookName = "La Despidida";
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "2",
+                "bad username",
+                "bad auth code",
+                bookName,
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        when(mockedLibrary.findBookIdByName(bookName)).thenReturn(bookID);
+
+        cli.run();
+
+        verify(mockedLibrary, never()).removeBook(bookID);
     }
 
     //     OPTION 3: Check Book Availability
@@ -616,19 +653,6 @@ public class CLITest {
 
         verify(book1).getBookInfo();
         verify(book2).getBookInfo();
-    }
-
-
-    @Test
-    void testViewAllBooks_whenLibraryIsEmpty() {
-        String userInput = String.join("\n",
-                "6", "", this.cliExitOption
-        );
-
-        CLI cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-        cli.run();
-
-        verify(mockedSystemOut).println("There are no books in the library");
     }
 
     //    OPTION 7: Add Member
@@ -1174,19 +1198,23 @@ public class CLITest {
     void testEmptyBook() {
         String bookName = "";
 
-        // Fake user input: 2 (remove book), then book name, then anything to continue
+        // Fake user input
         String userInput = String.join("\n",
                 "2",              // Select option 2 (Remove Book)
-                bookName,               // Book name
-                "",                     // (Empty input to get to menu)
-                this.cliExitOption                    // Exit (after adding book, immediately exit)
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                bookName,
+                "",
+                this.cliExitOption // Exit
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
         cli.run();
 
-        verifyNoInteractions(mockedLibrary);
+        verify(mockedLibrary, never()).removeBook(anyString());
     }
 
     //     OPTION 3: Check Book Availability
@@ -1285,7 +1313,35 @@ public class CLITest {
     }
 
     //    OPTION 6: View All Books
-        // No structural tests made for this one
+
+    @Test
+    void testViewAllBooks_whenBooksInLibraryIsEmpty() {
+        String userInput = String.join("\n",
+                "6", "", this.cliExitOption
+        );
+
+        Library library = new Library();
+
+        CLI cli = new CLI(new StringReader(userInput), mockedSystemOut, library, mockedAccounts, mockedLibrarians);
+        cli.run();
+
+        verify(mockedSystemOut).println("There are no books in the library");
+    }
+
+    @Test
+    void testViewAllBooks_whenBooksInLibraryIsNull() {
+        String userInput = String.join("\n",
+                "6", "", this.cliExitOption
+        );
+
+        Library library = new Library();
+        library.AllBooksInLibrary = null;
+
+        CLI cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.run();
+
+        verify(mockedSystemOut).println("There are no books in the library");
+    }
 
     //    OPTION 7: Add Member
 

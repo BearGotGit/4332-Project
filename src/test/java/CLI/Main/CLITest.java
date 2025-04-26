@@ -42,7 +42,7 @@ public class CLITest {
 
     // ***** Specification Tests *****
 
-    //    OPTION 1) Add Book
+    //    OPTION 1: Order Book
 
     //    Book not in library yet; add it (happy case)
     @Test
@@ -128,7 +128,7 @@ public class CLITest {
         );
     }
 
-    //    OPTION 2) Remove Book
+    //    OPTION 2: Remove Book
 
     //    Remove book (in library)
     @Test
@@ -179,7 +179,7 @@ public class CLITest {
         verifyNoMoreInteractions(mockedLibrary);
     }
 
-    //     OPTION 3) Check Book Availability
+    //     OPTION 3: Check Book Availability
 
     //    Book can't be found
     @Test
@@ -247,7 +247,7 @@ public class CLITest {
         verifyNoMoreInteractions(mockedLibrary);
     }
 
-    //    OPTION 4) Checkout Book
+    //    OPTION 4: Checkout Book
 
     @Test
     void testCheckoutBook() {
@@ -256,7 +256,7 @@ public class CLITest {
 
         // Simulated user input: 4 (checkout book), member ID, book name, "", 10 (exit)
         String userInput = String.join("\n",
-                "4",          // Select option 4: Checkout Book
+                "4",          // Select option 4 (Checkout Book)
                 memberId,     // Member ID
                 bookName,     // Book name
                 "",           // Continue
@@ -273,7 +273,7 @@ public class CLITest {
         verify(mockedLibrary).checkoutBook(memberId, bookName);
     }
 
-    //    OPTION 5) Return Book
+    //    OPTION 5: Return Book
 
     @Test
     void testReturnBook() {
@@ -320,7 +320,7 @@ public class CLITest {
         verify(mockedLibrary, never()).returnBook(anyString(), anyString());
     }
 
-    //    OPTION 6) View All Books
+    //    OPTION 6: View All Books
 
     @Test
     void testViewAllBooks_withBooks() {
@@ -358,7 +358,7 @@ public class CLITest {
         verify(mockedSystemOut).println("There are no books in the library");
     }
 
-    //    OPTION 7) Add Member
+    //    OPTION 7: Add Member
 
     @Test
     void addMemberTestShouldSucceed() {
@@ -415,7 +415,7 @@ public class CLITest {
         verify(mockedSystemOut).println("New member couldn't be created");
     }
 
-    //    OPTION 8) Revoke Membership
+    //    OPTION 8: Revoke Membership
 
     @Test
     void revokeMembershipTestShouldSucceed() {
@@ -469,10 +469,16 @@ public class CLITest {
         verify(mockedSystemOut).println("\nFailed to revoke membership of member with ID: testMemberID");
     }
 
-    //    OPTION 9) View All Members
+    //    OPTION 9: View All Members
         // None
 
-    //    OPTION 10) Exit
+    //    OPTION 10: Hire Part-Time Librarian
+
+    //    OPTION 11: Withdraw Salary
+
+    //    OPTION 12: Donate to Library
+
+    //    OPTION 13: Exit
 
     @Test
     void exitTestShouldSucceed() {
@@ -496,7 +502,7 @@ public class CLITest {
 
     // ***** Property Tests *****
 
-    //    OPTION 9) View All Members
+    //    OPTION 9: View All Members
 
     @Property
     void viewAllMembersTestShouldSucceed(@ForAll @IntRange(min = 1, max = 5) int size) {
@@ -525,7 +531,7 @@ public class CLITest {
 
     // ***** Structural Tests *****
 
-    //    OPTION 1) Add Book
+    //    OPTION 1: Order Book
 
     //    Empty field (bookName)
     @Test
@@ -730,7 +736,7 @@ public class CLITest {
         verifyNoInteractions(mockedLibrary);
     }
 
-    //    OPTION 2) Remove Book
+    //    OPTION 2: Remove Book
 
     //    Empty book name
     @Test
@@ -752,7 +758,7 @@ public class CLITest {
         verifyNoInteractions(mockedLibrary);
     }
 
-    //     OPTION 3) Check Book Availability
+    //     OPTION 3: Check Book Availability
 
     //    Bad Book Name
     @Test
@@ -771,7 +777,7 @@ public class CLITest {
         verifyNoInteractions(mockedLibrary);
     }
 
-    //    OPTION 4) Checkout Book
+    //    OPTION 4: Checkout Book
 
     @Test
     void testCheckoutBook_emptyMemberId_triggersValidation() {
@@ -810,7 +816,7 @@ public class CLITest {
         verify(mockedLibrary, never()).checkoutBook(anyString(), anyString());
     }
 
-    //    OPTION 5) Return Book
+    //    OPTION 5: Return Book
 
     @Test
     void testReturnBook_emptyMemberId_triggersValidation() {
@@ -844,10 +850,10 @@ public class CLITest {
         verify(mockedLibrary, never()).returnBook(anyString(), anyString());
     }
 
-    //    OPTION 6) View All Books
+    //    OPTION 6: View All Books
         // No structural tests made for this one
 
-    //    OPTION 7) Add Member
+    //    OPTION 7: Add Member
 
     @Test
     void addMemberTestFail_NameEmpty() {
@@ -926,7 +932,7 @@ public class CLITest {
         verify(mockedLibrary, never()).addMember(anyString(), anyString());
     }
 
-    //    OPTION 8) Revoke Membership
+    //    OPTION 8: Revoke Membership
 
     @Test
     void revokeMembershipTest_EmptyIDisBad() {
@@ -975,7 +981,7 @@ public class CLITest {
         verify(mockedLibrary, never()).revokeMembership(anyString());
     }
 
-    //    OPTION 9) View All Members
+    //    OPTION 9: View All Members
 
     @Test
     void viewAllMembers_Null() {
@@ -1007,6 +1013,12 @@ public class CLITest {
         verify(mockedSystemOut).println("There are no members in the library");
     }
 
-    //    OPTION 10) Exit
+    //    OPTION 10: Hire Part-Time Librarian
+
+    //    OPTION 11: Withdraw Salary
+
+    //    OPTION 12: Donate to Library
+
+    //    OPTION 13: Exit
         // None
 }

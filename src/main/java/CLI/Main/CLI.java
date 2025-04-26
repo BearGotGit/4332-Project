@@ -35,25 +35,25 @@ public class CLI {
             outStream.print("""
                     
                     """ + stars + """
-                    
-                    
-                    You have these options:
-                    
-                    1. Order Book
-                    2. Remove Book
-                    3. Check Book Availability
-                    4. Checkout Book
-                    5. Return Book
-                    6. View All Books
-                    7. Add Member
-                    8. Revoke Membership
-                    9. View All Members
-                    10. Hire Part-Time Librarian
-                    11. Withdraw Salary
-                    12. Donate to Library
-                    13. EXIT
-                    
-                    Enter the number of the option you want to select:""" + " ");
+                
+                
+                You have these options:
+                
+                1. Order Book
+                2. Remove Book
+                3. Check Book Availability
+                4. Checkout Book
+                5. Return Book
+                6. View All Books
+                7. Add Member
+                8. Revoke Membership
+                9. View All Members
+                10. Hire Part-Time Librarian
+                11. Withdraw Salary
+                12. Donate to Library
+                13. EXIT
+                
+                Enter the number of the option you want to select:""" + " ");
             String option = scanner.nextLine();
 
             outStream.println();

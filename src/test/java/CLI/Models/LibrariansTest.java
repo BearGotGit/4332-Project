@@ -38,7 +38,7 @@ public class LibrariansTest {
     }
 
     @Test
-    void authLibrarianTestShouldBePartTime() {
+    void authLibrarianNullTestShouldBePartTime() {
         // authLibrarian() should return PART_TIME
 
         librarians.hirePartTimeLibrarian("A", "111111", "X");
@@ -46,6 +46,28 @@ public class LibrariansTest {
         var authResult = librarians.authLibrarian("X", null);
 
         assertEquals(Librarians.AuthType.PART_TIME, authResult);
+    }
+
+    @Test
+    void authLibrarianEmptyTestShouldBePartTime() {
+        // authLibrarian() should return PART_TIME
+
+        librarians.hirePartTimeLibrarian("A", "111111", "X");
+
+        var authResult = librarians.authLibrarian("X", "");
+
+        assertEquals(Librarians.AuthType.PART_TIME, authResult);
+    }
+
+    @Test
+    void authLibrarianTestShouldBeNotAuthorized() {
+        // authLibrarian() should return NOT_AUTHORIZED
+
+        librarians.hirePartTimeLibrarian("A", "111111", "X");
+
+        var authResult = librarians.authLibrarian("X", "Part-time librarians don't have auth codes");
+
+        assertEquals(Librarians.AuthType.NOT_AUTHORIZED, authResult);
     }
 
     @Test
@@ -149,7 +171,7 @@ public class LibrariansTest {
 
     // Structural tests
     @Test
-    void authLibrarianTestShouldBeNotAuthorized() {
+    void authLibrarianNullTestShouldBeNotAuthorized() {
         // authLibrarian() should return NOT_AUTHORIZED
 
         var authResult = librarians.authLibrarian("X", "123456");

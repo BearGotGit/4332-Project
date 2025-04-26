@@ -38,7 +38,14 @@ public class Librarians {
         if (!authCodes.containsKey(username)) return AuthType.NOT_AUTHORIZED; // not a librarian
 
         String authCode = authCodes.get(username);
-        if (authCode == null) return AuthType.PART_TIME; // part-time, no auth
+        // No code for the librarian (part-time) and no code passed in (part-time)
+        if (authCode == null && (authTry == null || authTry.isBlank())) {
+            return AuthType.PART_TIME; // part-time, no auth
+        }
+        else if (authCode == null) {
+            // Librarian has no code, but code was passed in
+            return AuthType.NOT_AUTHORIZED;
+        }
 
         return authCode.equals(authTry) ? AuthType.FULL_TIME : AuthType.NOT_AUTHORIZED; // full-time, check match
     }

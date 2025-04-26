@@ -78,7 +78,7 @@ public class CLI {
 
                     outStream.print("Enter book name to remove: ");
                     String book = scanner.nextLine();
-                    if (book.isEmpty()) {
+                    if (book.isBlank()) {
                         outStream.println("\nNot a valid book name");
                         break;
                     }
@@ -97,7 +97,7 @@ public class CLI {
                     outStream.println("You chose to check a book's availability");
                     outStream.print("Enter book name: ");
                     String book = scanner.nextLine();
-                    if (book.isEmpty()) {
+                    if (book.isBlank()) {
                         outStream.println("\nNot a valid genre");
                         break;
                     }
@@ -123,7 +123,7 @@ public class CLI {
                     outStream.println("You chose to checkout a new book");
                     outStream.print("Enter your member ID: ");
                     String memberID = scanner.nextLine();
-                    if (memberID == null || memberID.isEmpty()) {
+                    if (memberID == null || memberID.isBlank()) {
                         outStream.println("\nNot a valid ID");
                         break;
                     }
@@ -133,7 +133,7 @@ public class CLI {
                     }
                     outStream.print("Enter book name: ");
                     String bookName = scanner.nextLine();
-                    if (bookName == null || bookName.isEmpty()) {
+                    if (bookName == null || bookName.isBlank()) {
                         outStream.println("\nNot a valid book name");
                         break;
                     }
@@ -181,13 +181,13 @@ public class CLI {
                     outStream.println("You chose to return a book");
                     outStream.print("Enter your member ID: ");
                     String memberID = scanner.nextLine();
-                    if (memberID == null || memberID.isEmpty()) {
+                    if (memberID == null || memberID.isBlank()) {
                         outStream.println("\nNot a valid ID");
                         break;
                     }
                     outStream.print("Enter book name: ");
                     String book = scanner.nextLine();
-                    if (book == null || book.isEmpty()) {
+                    if (book == null || book.isBlank()) {
                         outStream.println("\nNot a valid book name");
                         break;
                     }
@@ -225,13 +225,13 @@ public class CLI {
                     
                     outStream.print("Enter member name: ");
                     String name = scanner.nextLine();
-                    if (name.isEmpty()) {
+                    if (name.isBlank()) {
                         outStream.println("\nNot a valid name");
                         break;
                     }
                     outStream.print("Enter member email: ");
                     String email = scanner.nextLine();
-                    if (email.isEmpty()) {
+                    if (email.isBlank()) {
                         outStream.println("\nNot a valid email");
                         break;
                     }
@@ -258,7 +258,7 @@ public class CLI {
 
                     outStream.print("Enter member ID to revoke: ");
                     String memberID = scanner.nextLine();
-                    if (memberID.isEmpty()) {
+                    if (memberID.isBlank()) {
                         outStream.println("\nNot a valid ID");
                         break;
                     }
@@ -297,7 +297,7 @@ public class CLI {
 
                     outStream.print("Enter the new username: ");
                     String newUsername = scanner.nextLine();
-                    if (newUsername.isEmpty()) {
+                    if (newUsername.isBlank()) {
                         outStream.println("\nNot a valid username");
                         break;
                     }
@@ -338,7 +338,7 @@ public class CLI {
 
                     outStream.print("How much would you like to donate?: ");
                     String donationStr = scanner.nextLine();
-                    if (donationStr.isEmpty()) {
+                    if (donationStr.isBlank()) {
                         outStream.println("\nNot a valid donation");
                         break;
                     }
@@ -379,16 +379,13 @@ public class CLI {
     public AuthResult authenticate() {
         outStream.print("Enter your librarian username: ");
         String username = scanner.nextLine();
-        if (username.isEmpty()) {
+        if (username.isBlank()) {
             outStream.println("\nNot a valid username");
             return new AuthResult(username, null, Librarians.AuthType.NOT_AUTHORIZED);
         }
         outStream.print("Enter your auth code: ");
         String authCode = scanner.nextLine();
-        if (authCode.isEmpty()) {
-            outStream.println("\nNot a valid authCode");
-            return new AuthResult(username, authCode, Librarians.AuthType.NOT_AUTHORIZED);
-        }
+        authCode = authCode.isBlank() ? null : authCode;
         return new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
     }
 
@@ -399,8 +396,8 @@ public class CLI {
     private Book orderBook(String librarianUsername, String authCode, String bookName) {
         outStream.println("You chose to order " + (bookName == null ? "a new book" : "the book: " + bookName));
         AuthResult auth = null;
-        if (librarianUsername == null || librarianUsername.isEmpty() ||
-                authCode == null || authCode.isEmpty()) {
+        if (librarianUsername == null || librarianUsername.isBlank() ||
+                authCode == null || authCode.isBlank()) {
             auth = authenticate();
             if (auth.authType == Librarians.AuthType.FULL_TIME) {
                 outStream.println("\nSuccessfully authorized!");
@@ -414,10 +411,10 @@ public class CLI {
         }
 
         String name = null;
-        if (bookName == null || bookName.isEmpty()) {
+        if (bookName == null || bookName.isBlank()) {
             outStream.print("Enter book name: ");
             name = scanner.nextLine();
-            if (name.isEmpty()) {
+            if (name.isBlank()) {
                 outStream.println("\nNot a valid name");
                 return null;
             }
@@ -429,13 +426,13 @@ public class CLI {
 
         outStream.print("Enter author: ");
         String author = scanner.nextLine();
-        if (author.isEmpty()) {
+        if (author.isBlank()) {
             outStream.println("\nNot a valid author");
             return null;
         }
         outStream.print("Enter year: ");
         String yearString = scanner.nextLine();
-        if (yearString.isEmpty()) {
+        if (yearString.isBlank()) {
             outStream.println("\nNot a valid year");
             return null;
         }
@@ -448,13 +445,13 @@ public class CLI {
         }
         outStream.print("Enter Genre: ");
         String genre = scanner.nextLine();
-        if (genre.isEmpty()) {
+        if (genre.isBlank()) {
             outStream.println("\nNot a valid genre");
             return null;
         }
         outStream.print("Enter ISBN: ");
         String isbnString = scanner.nextLine();
-        if (isbnString.isEmpty()) {
+        if (isbnString.isBlank()) {
             outStream.println("\nNot a valid ISBN");
             return null;
         }
@@ -488,6 +485,7 @@ public class CLI {
         public Librarians.AuthType authType;
 
         public AuthResult(String username, String authCode, Librarians.AuthType authType) {
+//            System.out.println("Auth result: " + username + ", " + authCode + ", " + authType);
             this.username = username;
             this.authCode = authCode;
             this.authType = authType;

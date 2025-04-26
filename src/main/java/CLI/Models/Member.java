@@ -13,7 +13,7 @@ public class Member {
     String testableMemberInfo; // only visible to the same package (only tests can see it)
 
     public Member(String Name, String Email, String MemberID) {
-        if (Name == null || Name.isEmpty()) {
+        if (Name == null || Name.isBlank()) {
             System.out.println("ERROR: Name is null or empty");
             return;
         }
@@ -21,7 +21,7 @@ public class Member {
             System.out.println("ERROR: Email is null");
             return;
         }
-        if (MemberID == null || MemberID.isEmpty()) {
+        if (MemberID == null || MemberID.isBlank()) {
             System.out.println("ERROR: MemberID is null or empty");
             return;
         }
@@ -42,7 +42,7 @@ public class Member {
     }
 
     public void addBorrowedBook(String bookID) {
-        if (bookID == null || bookID.isEmpty()) {
+        if (bookID == null || bookID.isBlank()) {
             System.out.println("ERROR: BookID is null or empty");
             return;
         }
@@ -55,7 +55,7 @@ public class Member {
     }
 
     public void removeBorrowedBook(String bookID) {
-        if (bookID == null || bookID.isEmpty()) {
+        if (bookID == null || bookID.isBlank()) {
             System.out.println("ERROR: BookID is null or empty");
             return;
         }
@@ -63,11 +63,11 @@ public class Member {
     }
 
     public void updateMemberInfo(String Name, String Email) {
-        if (Name == null || Name.isEmpty()) {
+        if (Name == null || Name.isBlank()) {
             System.out.println("ERROR: Name is null or empty");
             return;
         }
-        if (Email == null || Email.isEmpty()) {
+        if (Email == null || Email.isBlank()) {
             System.out.println("ERROR: Name is null or empty");
             return;
         }

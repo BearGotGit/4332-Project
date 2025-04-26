@@ -1,18 +1,14 @@
 package CLI.Main;
 
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Property;
-import net.jqwik.api.constraints.IntRange;
-import net.jqwik.api.lifecycle.BeforeTry;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import net.jqwik.api.*;
+import net.jqwik.api.constraints.*;
+import net.jqwik.api.lifecycle.*;
+import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import CLI.Models.*;
-import org.mockito.Spy;
 
 import java.io.PrintStream;
 import java.io.StringReader;
@@ -29,7 +25,7 @@ public class CLITest {
     String cliExitOption = "13";
 
     String testLibrarianUser = "A";
-    String testLibrarianAuth = "111111";
+    String testLibrarianAuthCode = "111111";
 
     @BeforeEach
     @BeforeTry
@@ -41,6 +37,45 @@ public class CLITest {
     }
 
     // ***** Specification Tests *****
+
+    // Auth
+
+    @Test
+    void authenticateTestShouldBeFullTime() {
+        // authenticate() should return FULL_TIME
+
+        String userInput = String.join("\n",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                ""
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.FULL_TIME, authResult.authType);
+    }
+
+    @Test
+    void authenticateTestShouldBePartTime() {
+        // authenticate() should return PART_TIME
+
+        String userInput = String.join("\n",
+                testLibrarianUser,
+                "",
+                ""
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), isNull())).thenReturn(Librarians.AuthType.PART_TIME);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.PART_TIME, authResult.authType);
+//        verify(mockedLibrarians, never()).authLibrarian(anyString(), anyString());
+    }
 
     //    OPTION 1: Order Book
 
@@ -368,7 +403,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "7",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 name,
                 email,
                 "",
@@ -379,7 +414,7 @@ public class CLITest {
         Member mockedMember = mock(Member.class);
         when(mockedLibrary.addMember(anyString(), anyString())).thenReturn(mockedMember);
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
@@ -397,7 +432,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "7",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 name,
                 email,
                 "",
@@ -406,7 +441,7 @@ public class CLITest {
 
         when(mockedLibrary.addMember(anyString(), anyString())).thenReturn(null);
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
@@ -425,7 +460,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "8",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 memberID,
                 "",
                 this.cliExitOption
@@ -434,7 +469,7 @@ public class CLITest {
 //        Mock to revoke
         when(mockedLibrary.revokeMembership(anyString())).thenReturn(true);
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 //        CLI and run code
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
@@ -451,7 +486,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "8",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 memberID,
                 "",
                 this.cliExitOption
@@ -460,7 +495,7 @@ public class CLITest {
 //        Mock to revoke
         when(mockedLibrary.revokeMembership(anyString())).thenReturn(false);
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 //        CLI and run code
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 
@@ -530,6 +565,25 @@ public class CLITest {
     }
 
     // ***** Structural Tests *****
+
+    // Auth
+
+    @Test
+    void authenticateTestShouldBeFail() {
+        // authenticate() should return NOT_AUTHORIZED
+
+        String userInput = String.join("\n",
+                "",
+                ""
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.NOT_AUTHORIZED, authResult.authType);
+    }
 
     //    OPTION 1: Order Book
 
@@ -863,7 +917,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "7",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 name,
                 email,
                 "",
@@ -871,7 +925,7 @@ public class CLITest {
         );
 
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
@@ -888,7 +942,7 @@ public class CLITest {
         String userInput = String.join("\n",
                 "7",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 name,
                 email,
                 "",
@@ -899,7 +953,7 @@ public class CLITest {
         Member mockedMember = mock(Member.class);
         when(mockedLibrary.addMember(anyString(), anyString())).thenReturn(mockedMember);
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
         cli.run();
@@ -942,14 +996,14 @@ public class CLITest {
         String userInput = String.join("\n",
                 "8",
                 testLibrarianUser,
-                testLibrarianAuth,
+                testLibrarianAuthCode,
                 memberID,
                 "",
                 this.cliExitOption
         );
 
 //        When authenticating, it's important that the librarian is auth and also FULL_TIME
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuth)).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 //        CLI and run code
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
 

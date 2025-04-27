@@ -164,7 +164,7 @@ public class CLI {
 
                         outStream.println();
                         if (checkoutOption.equals("1")) {
-                            AuthResult auth = currentLibrarian != null ? currentLibrarian : authenticate(true);
+                            AuthResult auth = currentLibrarian == null || currentLibrarian.authType != Librarians.AuthType.FULL_TIME ? authenticate(true) : currentLibrarian;
                             if (auth.authType == Librarians.AuthType.FULL_TIME) {
                                 outStream.println("\nYou are authorized as a full-time librarian!");
                                 Book book = orderBook(auth.username, auth.authCode, bookName);

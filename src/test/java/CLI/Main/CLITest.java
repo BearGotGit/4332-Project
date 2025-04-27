@@ -599,6 +599,54 @@ public class CLITest {
     }
 
     @Test
+    void testCheckoutBookWhenBookDoesNotExistAndCurrentLibrarianLoggedInPartTime() {
+        // orderBook() and checkoutBook() should be called correctly
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "1", // Order Book
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.PART_TIME);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        // orderBook() mocks
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(true);
+        Book book = new Book(bookName, author, year, genre, ISBN, "1");
+        when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(book);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was called
+        verify(mockedLibrary).checkoutBook(memberID, bookName);
+    }
+
+    @Test
     void testCheckoutBookWhenBookIsNotAvailableOrderFails() {
         // orderBook() fails
 

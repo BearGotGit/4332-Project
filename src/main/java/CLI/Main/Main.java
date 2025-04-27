@@ -15,8 +15,8 @@ public class Main {
     public static void main(String[] args) {
         Purchasing purchasing = new Purchasing();
         Map<String, AuthCodeAndSalary> fullTimeLibrarians = Map.of(
-                "A", AuthCodeAndSalary.of("111111", 7_500.00),
-                "B", AuthCodeAndSalary.of("222222", 10_000.00),
+                "A", AuthCodeAndSalary.of("111111", 10_000.00),
+                "B", AuthCodeAndSalary.of("222222", 7_500.00),
                 "C", AuthCodeAndSalary.of("333333", 5_000.00)
         );
 

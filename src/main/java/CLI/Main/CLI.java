@@ -416,11 +416,17 @@ public class CLI {
                     outStream.println("Invalid option");
                 }
             }
-            if (exit) break;
+            if (exit) {
+                break;
+            }
 
             if (!skip) {
                 outStream.print("\nPress any key to continue: ");
-                input = scanner.nextLine();
+                if (scanner.hasNextLine()) {
+                    input = scanner.nextLine();
+                } else {
+                    break;
+                }
             }
         }
         scanner.close();

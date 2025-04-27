@@ -19,13 +19,6 @@ public class Library {
         Members = new ArrayList<Member>();
     }
 
-    // public Library(List<String> AvailableBooksIds, List<Book> AllBooksInLibrary, List<String> LoanedBooks, List<Member> Members) {
-    //     this.AvailableBookIds = AvailableBooksIds;
-    //     this.AllBooksInLibrary = AllBooksInLibrary;
-    //     this.LoanedBooks = LoanedBooks;
-    //     this.Members = Members;
-    // }
-
     // Get a book's ID from its name
     public String findBookIdByName(String bookName) {
         for (Book book : AllBooksInLibrary) {
@@ -150,8 +143,7 @@ public class Library {
     // Return a book to the library
     public void returnBook(String memberID, String bookID) {
         Member member = Members.stream()
-                                .filter(m -> m.MemberID.equals(memberID) && 
-                                        m.BorrowedBookList.contains(bookID))
+                                .filter(m -> m.MemberID.equals(memberID) && m.BorrowedBookList.contains(bookID))
                                 .findFirst()
                                 .orElse(null);
         if (member == null) {

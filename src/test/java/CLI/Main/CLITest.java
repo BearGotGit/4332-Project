@@ -23,7 +23,7 @@ public class CLITest {
     Librarians mockedLibrarians;
     PrintStream mockedSystemOut;
     CLI cli;
-    String cliExitOption = "13";
+    String cliExitOption = "15";
 
     String testLibrarianUser = "A";
     String testLibrarianAuthCode = "111111";
@@ -70,7 +70,7 @@ public class CLITest {
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-        when(mockedLibrarians.authLibrarian(anyString(), isNull())).thenReturn(Librarians.AuthType.PART_TIME);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, null)).thenReturn(Librarians.AuthType.PART_TIME);
 
         CLI.AuthResult authResult = cli.authenticate();
 
@@ -93,6 +93,74 @@ public class CLITest {
         CLI.AuthResult authResult = cli.authenticate();
 
         assertEquals(Librarians.AuthType.NOT_AUTHORIZED, authResult.authType);
+    }
+
+    @Test
+    void authenticateTestWhenFullTime() {
+        // authenticate() should IMMEDIATELY return FULL_TIME
+
+        cli = new CLI(new StringReader(""), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.FULL_TIME);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.FULL_TIME, authResult.authType);
+    }
+
+    @Test
+    void authenticateTestWhenPartTime() {
+        // authenticate() should IMMEDIATELY return PART_TIME
+
+        cli = new CLI(new StringReader(""), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.PART_TIME);
+
+        CLI.AuthResult authResult = cli.authenticate();
+
+        assertEquals(Librarians.AuthType.PART_TIME, authResult.authType);
+    }
+
+    @Test
+    void authenticateTestWhenPartTimeRequestFullTime() {
+        // authenticate() should run through the full function and return FULL_TIME
+
+        String userInput = String.join("\n",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                ""
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.PART_TIME);
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        CLI.AuthResult authResult = cli.authenticate(true);
+
+        assertEquals(Librarians.AuthType.FULL_TIME, authResult.authType);
+    }
+
+    // Prettify Auth Type
+    @Test
+    void prettifyTest() {
+        // Test the prettify func used to print the current user
+
+        Librarians.AuthType fullType = Librarians.AuthType.FULL_TIME;
+        Librarians.AuthType partType = Librarians.AuthType.PART_TIME;
+        Librarians.AuthType notType = Librarians.AuthType.NOT_AUTHORIZED;
+
+        String expectedFull = "Full Time";
+        String expectedPart = "Part Time";
+        String expectedNot = "Not Authorized";
+
+        cli = new CLI(new StringReader(""), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        String fullResult = cli.prettify(fullType);
+        String partResult = cli.prettify(partType);
+        String notResult = cli.prettify(notType);
+
+        assertEquals(expectedFull, fullResult);
+        assertEquals(expectedPart, partResult);
+        assertEquals(expectedNot, notResult);
     }
 
     //    OPTION 1: Order Book
@@ -213,6 +281,34 @@ public class CLITest {
 
         when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
 
+        when(mockedLibrary.findBookIdByName(bookName)).thenReturn(bookID);
+
+        cli.run();
+
+        verify(mockedLibrary).removeBook(bookID);
+    }
+
+    //    Remove book (in library)
+    @Test
+    void testRemoveBookPartTime() {
+        // removeBook() should be called correctly
+
+        String bookID = "bookID";
+        String bookName = "La Despidida";
+
+        String partTimeUser = "partTimeUser";
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "2",
+                partTimeUser,
+                bookName,
+                "",
+                this.cliExitOption // Exit
+        );
+
+       cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(partTimeUser, null)).thenReturn(Librarians.AuthType.PART_TIME);
         when(mockedLibrary.findBookIdByName(bookName)).thenReturn(bookID);
 
         cli.run();
@@ -408,7 +504,7 @@ public class CLITest {
     }
 
     @Test
-    void testCheckoutBookWhenBookIsNotAvailable() {
+    void testCheckoutBookWhenBookDoesNotExist() {
         // orderBook() and checkoutBook() should be called correctly
 
         String memberID = "1";
@@ -436,6 +532,52 @@ public class CLITest {
 
         // Create CLI with fake input and mocked library
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Checkout option mocks
+        when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
+        when(mockedLibrary.findBookIdByName(anyString())).thenReturn(null);
+
+        // orderBook() mocks
+        when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedAccounts.orderNewBook(bookName, author, year, genre, ISBN)).thenReturn(true);
+        Book book = new Book(bookName, author, year, genre, ISBN, "1");
+        when(mockedLibrary.addBook(anyString(), anyString(), anyInt(), anyString(), anyInt())).thenReturn(book);
+
+        // Run
+        cli.run();
+
+        // Verify that the library's checkoutBook method was called
+        verify(mockedLibrary).checkoutBook(memberID, bookName);
+    }
+
+    @Test
+    void testCheckoutBookWhenBookDoesNotExistAndCurrentLibrarianLoggedInFullTime() {
+        // orderBook() and checkoutBook() should be called correctly
+
+        String memberID = "1";
+        String bookName = "Test Book";
+        String author = "Jane Doe";
+        int year = 2024;
+        String genre = "Fiction";
+        int ISBN = 123456;
+
+        // Simulated user input
+        String userInput = String.join("\n",
+                "4",          // Select option 4 (Checkout Book)
+                memberID,
+                bookName,
+                "1", // Order Book
+                author,
+                String.valueOf(year),
+                genre,
+                String.valueOf(ISBN),
+                "",
+                this.cliExitOption  // Exit
+        );
+
+        // Create CLI with fake input and mocked library
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.FULL_TIME);
 
         // Checkout option mocks
         when(mockedLibrary.getAllMembers()).thenReturn(List.of(new Member("Name", "Email", memberID)));
@@ -775,7 +917,160 @@ public class CLITest {
 
     //    OPTION 12: Donate to Library
 
-    //    OPTION 13: Exit
+    //    OPTION 13: Log In
+    @Test
+    void logInTestFullTime() {
+        // Correct output should be printed
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "13",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("\nLogged in as a full-time librarian!");
+        assertEquals(Librarians.AuthType.FULL_TIME, cli.currentLibrarian.authType);
+    }
+
+    @Test
+    void logInTestPartTime() {
+        // Correct output should be printed
+
+        // Fake user input
+        String partTime = "testPartTime";
+        String userInput = String.join("\n",
+                "13",
+                partTime,
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(partTime, null)).thenReturn(Librarians.AuthType.PART_TIME);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("\nLogged in as a part-time librarian!");
+        assertEquals(Librarians.AuthType.PART_TIME, cli.currentLibrarian.authType);
+    }
+
+    @Test
+    void logInTestFailedAuth() {
+        // Correct output should be printed
+
+        // Fake user input
+        String badAuth = "badAuth";
+        String badCode = "badCode";
+        String userInput = String.join("\n",
+                "13",
+                badAuth,
+                badCode,
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        when(mockedLibrarians.authLibrarian(badAuth, badCode)).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("\nFailed to log in.");
+        assertNull(cli.currentLibrarian);
+    }
+
+    @Test
+    void logInTestAlreadyLoggedIn() {
+        // Correct output should be printed
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "13",
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.FULL_TIME);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("You must log out before you can log in.");
+        assertNotNull(cli.currentLibrarian);
+    }
+
+    @Test
+    void logInTestAlreadyLoggedInButNotAuthorized() {
+        // Correct output should be printed
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "13",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.NOT_AUTHORIZED);
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode)).thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("\nLogged in as a full-time librarian!");
+        assertEquals(Librarians.AuthType.FULL_TIME, cli.currentLibrarian.authType);
+    }
+
+    //    OPTION 15: Log Out
+    @Test
+    void logOutTest() {
+        // Correct output should be printed
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "14",
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.FULL_TIME);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("Successfully logged out!");
+        assertNull(cli.currentLibrarian);
+    }
+
+    @Test
+    void logOutTestAlreadyLoggedOut() {
+        // Correct output should be printed
+
+        // Fake user input
+        String userInput = String.join("\n",
+                "14",
+                "",
+                this.cliExitOption // Exit
+        );
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("You are already logged out!");
+        assertNull(cli.currentLibrarian);
+    }
+
+    //    OPTION 15: Exit
 
     @Test
     void exitTestShouldSucceed() {

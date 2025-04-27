@@ -3,6 +3,7 @@ package CLI.Main;
 import CLI.Models.*;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,6 +13,8 @@ public class CLI {
     Library library;
     LibraryAccounts libraryAccounts;
     Librarians librarians;
+
+    AuthResult currentLibrarian = null;
 
     Boolean exit = false;
     Boolean skip = false;
@@ -33,9 +36,11 @@ public class CLI {
 
         while (input != null) {
 
+            String userHeader = currentLibrarian == null ? "" : "\n\tCurrent Librarian: " + currentLibrarian.username + " | Employment Level: " + prettify(currentLibrarian.authType) + "\n";
+
             outStream.print("""
                     
-                    """ + stars + """
+                    """ + stars + (currentLibrarian == null ? "" : userHeader + stars) + """
                 
                 
                 You have these options:
@@ -52,7 +57,9 @@ public class CLI {
                 10. Hire Part-Time Librarian
                 11. Withdraw Salary
                 12. Donate to Library
-                13. EXIT
+                13. Log In
+                14. Log Out
+                15. EXIT
                 
                 Enter the number of the option you want to select:""" + " ");
             String option = scanner.nextLine();
@@ -69,11 +76,12 @@ public class CLI {
                 // 2. Remove book
                 case "2": {
                     outStream.println("You chose to remove a book");
+                    // They can be part-time, so they don't need to request to be full-time
                     if (authenticate().authType != Librarians.AuthType.NOT_AUTHORIZED) {
                         // Only librarians can remove books! (Including Part-Time)
-                        outStream.println("\nSuccessfully authorized!\n");
+                        outStream.println("\nSuccessfully authorized!");
                     } else {
-                        outStream.println("\nFailed to authorize.\n");
+                        outStream.println("\nFailed to authorize.");
                         break;
                     }
 
@@ -156,7 +164,7 @@ public class CLI {
 
                         outStream.println();
                         if (checkoutOption.equals("1")) {
-                            AuthResult auth = authenticate();
+                            AuthResult auth = currentLibrarian != null ? currentLibrarian : authenticate(true);
                             if (auth.authType == Librarians.AuthType.FULL_TIME) {
                                 outStream.println("\nYou are authorized as a full-time librarian!");
                                 Book book = orderBook(auth.username, auth.authCode, bookName);
@@ -169,7 +177,7 @@ public class CLI {
                                 break;
                             }
                         }
-                        break; // exit switch no matter what
+                        break;
                     }
 
                     outStream.println();
@@ -217,7 +225,7 @@ public class CLI {
                 // 7. Add Member
                 case "7": {
                     outStream.println("You chose to add a new member");
-                    if (authenticate().authType == Librarians.AuthType.FULL_TIME) {
+                    if (authenticate(true).authType == Librarians.AuthType.FULL_TIME) {
                         outStream.println("\nSuccessfully authorized!\n");
                     } else {
                         outStream.println("\nFailed to authorize. Must be a full-time librarian.\n");
@@ -250,7 +258,7 @@ public class CLI {
                 // 8. Revoke Membership
                 case "8": {
                     outStream.println("You chose to revoke a membership");
-                    if (authenticate().authType == Librarians.AuthType.FULL_TIME) {
+                    if (authenticate(true).authType == Librarians.AuthType.FULL_TIME) {
                         outStream.println("\nSuccessfully authorized!\n");
                     } else {
                         outStream.println("\nFailed to authorize. Must be a full-time librarian.\n");
@@ -287,13 +295,19 @@ public class CLI {
                 // 10. Hire Part-Time Librarian
                 case "10": {
                     outStream.println("You chose to hire a part-time librarian");
-                    outStream.println("First, you need to authenticate");
-                    AuthResult auth = authenticate();
-                    if (auth.authType == Librarians.AuthType.FULL_TIME) {
-                        outStream.println("\nSuccessfully authorized!\n");
-                    } else {
-                        outStream.println("\nFailed to authorize. Must be a full-time librarian.\n");
-                        break;
+                    AuthResult auth = currentLibrarian;
+                    if (auth == null || auth.authType != Librarians.AuthType.FULL_TIME) {
+                        if (auth != null && auth.authType == Librarians.AuthType.PART_TIME) {
+                            outStream.println("\nYou must be a full-time librarian to hire a new librarian");
+                        }
+                        outStream.println("First, you need to authenticate");
+                        auth = authenticate(true);
+                        if (auth.authType == Librarians.AuthType.FULL_TIME) {
+                            outStream.println("\nSuccessfully authorized!");
+                        } else {
+                            outStream.println("\nFailed to authorize. Must be a full-time librarian.");
+                            break;
+                        }
                     }
 
                     outStream.print("Enter the new username: ");
@@ -310,7 +324,7 @@ public class CLI {
                 // 11. Withdraw Salary
                 case "11": {
                     outStream.println("You chose to withdraw your salary");
-                    AuthResult auth = authenticate();
+                    AuthResult auth = authenticate(true);
                     if (auth.authType == Librarians.AuthType.FULL_TIME) {
                         outStream.println("\nSuccessfully authorized!\n");
                     } else {
@@ -334,11 +348,11 @@ public class CLI {
                 // 12. Donate to Library
                 case "12": {
                     outStream.println("You chose to donate to the library");
-                    AuthResult auth = authenticate();
+                    AuthResult auth = authenticate(true);
                     if (auth.authType == Librarians.AuthType.FULL_TIME) {
-                        outStream.println("\nSuccessfully authorized!\n");
+                        outStream.println("\nSuccessfully authorized!");
                     } else {
-                        outStream.println("\nFailed to authorize. Must be a full-time librarian.\n");
+                        outStream.println("\nFailed to authorize. Must be a full-time librarian.");
                         break;
                     }
 
@@ -361,8 +375,37 @@ public class CLI {
                     outStream.println("Thank you for donating $" + donation + "!");
                     break;
                 }
-                // 13. EXIT
-                case "13", "x", "X": {
+                // 13. Log In
+                case "13": {
+                    if (currentLibrarian != null && currentLibrarian.authType != Librarians.AuthType.NOT_AUTHORIZED) {
+                        outStream.println("You must log out before you can log in.");
+                        break;
+                    }
+                    currentLibrarian = null; // Just in case
+                    AuthResult auth = authenticate();
+                    if (auth.authType == Librarians.AuthType.FULL_TIME) {
+                        outStream.println("\nLogged in as a full-time librarian!");
+                    }
+                    else if (auth.authType == Librarians.AuthType.PART_TIME) {
+                        outStream.println("\nLogged in as a part-time librarian!");
+                    }
+                    else {
+                        outStream.println("\nFailed to log in.");
+                    }
+                    break;
+                }
+                // 14. Log Out
+                case "14": {
+                    if (currentLibrarian == null) {
+                        outStream.println("You are already logged out!");
+                        break;
+                    }
+                    currentLibrarian = null;
+                    outStream.println("Successfully logged out!");
+                    break;
+                }
+                // 15. EXIT
+                case "15", "x", "X": {
                     outStream.println("Goodbye!\n");
                     exit = true;
                     break;
@@ -384,22 +427,43 @@ public class CLI {
     }
 
     AuthResult authenticate() {
+        return authenticate(false);
+    }
+
+    AuthResult authenticate(Boolean requestFullTime) {
+        if (currentLibrarian != null) {
+            // If not null, then either full time or part-time, or requesting full time
+            if (currentLibrarian.authType == Librarians.AuthType.FULL_TIME) {
+                return currentLibrarian;
+            }
+            else if (!requestFullTime && currentLibrarian.authType == Librarians.AuthType.PART_TIME) {
+                return currentLibrarian;
+            }
+        }
+
+        if (requestFullTime) {
+            outStream.println("You must log in as a full-time librarian!\n");
+        }
         outStream.print("Enter your librarian username: ");
         String username = scanner.nextLine();
         if (username.isBlank()) {
             outStream.println("\nNot a valid username");
+            currentLibrarian = null;
             return new AuthResult(username, null, Librarians.AuthType.NOT_AUTHORIZED);
         }
         // Check if they are Part-Time
         Librarians.AuthType checkPartTime = librarians.authLibrarian(username, null);
         if (checkPartTime == Librarians.AuthType.PART_TIME) {
-            return new AuthResult(username, null, Librarians.AuthType.PART_TIME);
+            currentLibrarian = new AuthResult(username, null, Librarians.AuthType.PART_TIME);
+            return currentLibrarian;
         }
 
         outStream.print("Enter your auth code: ");
         String authCode = scanner.nextLine();
         authCode = authCode.isBlank() ? null : authCode;
-        return new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
+        AuthResult result = new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
+        currentLibrarian = result.authType == Librarians.AuthType.NOT_AUTHORIZED ? null : result;
+        return result;
     }
 
      void orderBook() {
@@ -412,7 +476,7 @@ public class CLI {
         if (librarianUsername == null || librarianUsername.isBlank() ||
             authCode == null || authCode.isBlank()
         ) {
-            auth = authenticate();
+            auth = authenticate(true);
         }
         else {
             auth = new AuthResult(librarianUsername, authCode, librarians.authLibrarian(librarianUsername, authCode));
@@ -420,7 +484,7 @@ public class CLI {
         if (auth.authType == Librarians.AuthType.FULL_TIME) {
             outStream.println("\nSuccessfully authorized!");
         } else {
-            outStream.println("\nFailed to authorize.");
+            outStream.println("\nFailed to authorize. Must be a full-time librarian.");
             return null;
         }
 
@@ -492,6 +556,14 @@ public class CLI {
         outStream.println("Successfully ordered book: " + name + "!");
         outStream.println(newBook.getBookInfo());
         return newBook;
+    }
+
+    String prettify(Librarians.AuthType type) {
+        String[] split = type.toString().split("_");
+        String[] capitalized = Arrays.stream(split)
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .toArray(String[]::new);
+        return String.join(" ", capitalized);
     }
 
     public static class AuthResult {

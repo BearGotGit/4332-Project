@@ -71,12 +71,12 @@ public class LibraryTest {
     //Creates a member and has him loan out a book, then tests for getting the member's id
     @Test
     void whoHasBook_bookLoaned_memberFound() {
-        Member member = new Member("M001", "John Doe", "john@example.com");
+        Member member = new Member("John Doe", "john@example.com", "M001");
         member.BorrowedBookList.add("B001");
         library.Members.add(member);
         library.LoanedBooksIDs.add("B001");
 
-        assertEquals("john@example.com", library.whoHasBook("B001").MemberID);
+        assertEquals("M001", library.whoHasBook("B001").MemberID);
     }
 
     //Tries to find member but none is there so returns null
@@ -104,7 +104,7 @@ public class LibraryTest {
         library.AllBooksInLibrary.add(new Book("Book_NotTrigger", "AuthorX", 2023, "Genre", 9999, "L123"));
         library.LoanedBooksIDs.add("L123");
 
-        Member m = new Member("M5", "Email", "m5@example.com");
+        Member m = new Member("Email", "m5@example.com", "M5");
         library.Members.add(m);
 
         Member result = library.whoHasBook("L123");
@@ -176,7 +176,7 @@ public class LibraryTest {
         library.AllBooksInLibrary.add(book);
         library.LoanedBooksIDs.add("B020");
 
-        Member member = new Member("M1", "Jane Doe", "jane@example.com");
+        Member member = new Member("Jane Doe", "jane@example.com", "M1");
         member.BorrowedBookList.add("B020");
         library.Members.add(member);
 
@@ -211,7 +211,7 @@ public class LibraryTest {
     //Test existing member but non-existing book
     @Test
     void checkoutBook_bookNotFound() {
-        Member m = new Member("M1", "Test", "test@example.com");
+        Member m = new Member("Name", "test@example.com", "M1");
         library.Members.add(m);
 
         library.checkoutBook("M1", "Fake Book");
@@ -222,7 +222,7 @@ public class LibraryTest {
     //Checkout for book that has already been borrowed
     @Test
     void checkoutBook_alreadyBorrowedByMember() {
-        Member member = new Member("M2", "Already Borrowed", "borrow@example.com");
+        Member member = new Member("Already Borrowed", "borrow@example.com", "M2");
         member.BorrowedBookList.add("B001");
         library.Members.add(member);
         library.AvailableBookIDs.add("B001");
@@ -234,7 +234,7 @@ public class LibraryTest {
     //Test to check out non-available book
     @Test
     void checkoutBook_bookNotAvailable() {
-        Member member = new Member("M3", "Not Available", "na@example.com");
+        Member member = new Member("Not Available", "na@example.com", "M3");
         library.Members.add(member);
         library.AllBooksInLibrary.add(new Book("Name_4", "Author", 2000, "Genre", 111, "B010"));
         library.LoanedBooksIDs.add("B010");
@@ -245,7 +245,7 @@ public class LibraryTest {
     //Test for returning a book that was loaned out
     @Test
     void returnBook_successfullyReturnsBook() {
-        Member member = new Member("M10", "Return Tester", "return@example.com");
+        Member member = new Member("Return Tester", "return@example.com", "M10");
         library.Members.add(member);
 
         Book book = new Book("ReturnMe", "Author", 2020, "Mystery", 54321, "B100");
@@ -277,7 +277,7 @@ public class LibraryTest {
     //Test for returning a book that member hasn't borrowed
     @Test
     void returnBook_bookNotBorrowedByMember() {
-        Member member = new Member("M11", "Wrong Member", "wrong@example.com");
+        Member member = new Member("Wrong Member", "wrong@example.com", "M11");
         library.Members.add(member);
 
         Book book = new Book("NotYours", "Author", 2018, "Comedy", 22222, "B102");
@@ -293,7 +293,7 @@ public class LibraryTest {
     //Test for returning a book that doesn't exist
     @Test
     void returnBook_bookNotFound() {
-        Member member = new Member("M12", "No Book", "nobook@example.com");
+        Member member = new Member("No Book", "nobook@example.com", "M12");
         member.BorrowedBookList.add("B999");
         library.Members.add(member);
 
@@ -305,8 +305,8 @@ public class LibraryTest {
     //Test for getting all members
     @Test
     void getAllMembers_returnsCorrectList() {
-        Member member1 = new Member("M20", "Member1", "member1@example.com");
-        Member member2 = new Member("M21", "Member2", "member2@example.com");
+        Member member1 = new Member("Name1", "member1@example.com", "M20");
+        Member member2 = new Member("Name2", "member2@example.com", "M21");
         library.Members.add(member1);
         library.Members.add(member2);
 
@@ -421,7 +421,7 @@ public class LibraryTest {
     //Test checkout with book that exists in AllBooksInLibrary but not in AvailableBookIDs
     @Test
     void checkoutBook_bookExistsButNotAvailable() {
-        Member member = new Member("M41", "Unavailable Tester", "unavail@example.com");
+        Member member = new Member("Unavailable Tester", "unavail@example.com", "M41");
         library.Members.add(member);
 
         Book book = new Book("Unavailable", "Some Author", 2021, "Mystery", 66666, "B401");
@@ -437,7 +437,7 @@ public class LibraryTest {
     //Test checkout when book doesn't exist but ID is in AvailableBookIDs
     @Test
     void checkoutBook_idAvailableButNoBook() {
-        Member member = new Member("M42", "Phantom Book", "phantom@example.com");
+        Member member = new Member("Phantom Book", "phantom@example.com", "M42");
         library.Members.add(member);
 
         library.AvailableBookIDs.add("B501");

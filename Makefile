@@ -1,7 +1,6 @@
 SRC=src/main/java/CLI
 OUT=out
-OUT_FULL=out/production/main/
-BACK_OUT=../../../../${OUT_FULL}
+BACK_OUT=../../../../${OUT}
 
 JAVAC_FLAGS=-d
 JAVA_FLAGS=-cp
@@ -14,17 +13,17 @@ JAVA_FLAGS=-cp
 
 .PHONY: all run execute clean # Tells make that these are keywords. Not necessary but helpful
 
-all: ${OUT_FULL}/Main/*.class # These are the dependencies
+all: ${OUT}/Main/*.class # These are the dependencies
 
 run: ${SRC}/Main/*.java
 	make clean && make execute
 
-execute: ${OUT_FULL}/Main/*.class
-	clear; cd ${SRC} && java ${JAVA_FLAGS} ${BACK_OUT} CLI.Main.CLI
+execute: ${OUT}/Main/*.class
+	clear; cd ${SRC} && java ${JAVA_FLAGS} ${BACK_OUT} CLI.Main.Main
 
-${OUT_FULL}/Main/*.class: ${SRC}/Main/*.java ${SRC}/Models/*.java
+${OUT}/Main/*.class: ${SRC}/Main/*.java ${SRC}/Models/*.java ${SRC}/Helpers/*.java
 # This is the command it runs if it has the dependencies
-	cd ${SRC} && javac ${JAVAC_FLAGS} ${BACK_OUT} Main/*.java Models/*.java
+	cd ${SRC} && javac ${JAVAC_FLAGS} ${BACK_OUT} Main/*.java Models/*.java Helpers/*.java
 
 clean:
 	rm -rf ${OUT}

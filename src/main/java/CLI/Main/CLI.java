@@ -405,7 +405,7 @@ public class CLI {
                     break;
                 }
                 // 15. EXIT
-                case "15", "x", "X": {
+                case "15", "x", "X", "q", "Q": {
                     outStream.println("Goodbye!\n");
                     exit = true;
                     break;
@@ -422,12 +422,9 @@ public class CLI {
 
             if (!skip) {
                 outStream.print("\nPress any key to continue: ");
-                if (scanner.hasNextLine()) {
-                    input = scanner.nextLine();
-                } else {
-                    break;
-                }
+                input = scanner.nextLine();
             }
+            skip = false;
         }
         scanner.close();
     }

@@ -88,6 +88,8 @@ public class CLITest {
         );
 
         cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.NOT_AUTHORIZED);
+
         when(mockedLibrarians.authLibrarian(anyString(), anyString())).thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
 
         CLI.AuthResult authResult = cli.authenticate();
@@ -761,7 +763,8 @@ public class CLITest {
                 "5",
                 "1",
                 "Nonexistent Book",
-                "", this.cliExitOption
+                "",
+                this.cliExitOption
         );
 
         when(mockedLibrary.findBookIdByName("Nonexistent Book")).thenReturn(null);
@@ -913,9 +916,260 @@ public class CLITest {
 
     //    OPTION 10: Hire Part-Time Librarian
 
+    @Test
+    void hirePartTimeLibrarian_Successful() {
+        // Arrange
+        //Hires a librarian, succeeds
+        String newUsername = "newPartTimer";
+        String userInput = String.join("\n",
+                "10",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                newUsername,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        // Assert/Verify
+        verify(mockedLibrarians).hirePartTimeLibrarian(testLibrarianUser, testLibrarianAuthCode, newUsername);
+    }
+
+    @Test
+    void hirePartTimeLibrarian_Successful_LibrarianAlreadySignedIn() {
+        // Arrange
+        //Hires a librarian, succeeds
+        String newUsername = "newPartTimer";
+        String userInput = String.join("\n",
+                "10",
+                newUsername,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.FULL_TIME);
+
+
+        cli.run();
+
+        // Assert/Verify
+        verify(mockedLibrarians).hirePartTimeLibrarian(testLibrarianUser, testLibrarianAuthCode, newUsername);
+    }
+
+    @Test
+    void hirePartTimeLibrarian_Successful_LibrarianAlreadySignedInAsPartTime() {
+        // Arrange
+        //Hires a librarian, succeeds
+        String newUsername = "newPartTimer";
+        String userInput = String.join("\n",
+                "10",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                newUsername,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.PART_TIME);
+
+
+        cli.run();
+
+        // Assert/Verify
+        verify(mockedLibrarians).hirePartTimeLibrarian(testLibrarianUser, testLibrarianAuthCode, newUsername);
+    }
+
+    @Test
+    void hirePartTimeLibrarian_Successful_LibrarianNotAuthorized() {
+        // Arrange
+        //Hires a librarian, succeeds
+        String newUsername = "newPartTimer";
+        String userInput = String.join("\n",
+                "10",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                newUsername,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+        cli.currentLibrarian = new CLI.AuthResult(testLibrarianUser, testLibrarianAuthCode, Librarians.AuthType.NOT_AUTHORIZED);
+
+
+        cli.run();
+
+        // Assert/Verify
+        verify(mockedLibrarians).hirePartTimeLibrarian(testLibrarianUser, testLibrarianAuthCode, newUsername);
+    }
+
+    @Test
+    void hirePartTimeLibrarian_FailedAuth() {
+        // Arrange
+        //Tries to hire but fails
+        String newUsername = "newPartTimer";
+        String userInput = String.join("\n",
+                "10",
+                "wrongUsername",
+                "wrongCode",
+                newUsername, // still provide username
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(anyString(), anyString()))
+                .thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert
+        verify(mockedLibrarians, never()).hirePartTimeLibrarian(anyString(), anyString(), anyString());
+    }
+
     //    OPTION 11: Withdraw Salary
 
+    @Test
+    void withdrawSalary_SuccessfulFullSalary() {
+        // Full Salary is found and withdrawn
+        String userInput = String.join("\n",
+                "11",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(1000.0);
+        when(mockedAccounts.withdrawSalary(1000.0))
+                .thenReturn(1000.0);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        verify(mockedLibrarians).librarianWithdrewSalary(testLibrarianUser, testLibrarianAuthCode, 1000.0);
+    }
+
+    @Test
+    void withdrawSalary_SalaryLessThanExpected() {
+        // Does not withdraw salary,withdraw is less
+        String userInput = String.join("\n",
+                "11",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(1000.0);
+        when(mockedAccounts.withdrawSalary(1000.0))
+                .thenReturn(500.0); // Withdraw less than expected
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert
+        verify(mockedSystemOut).println("Salary: $500.0 is less than expected: $1000.0");
+        verify(mockedLibrarians).librarianWithdrewSalary(testLibrarianUser, testLibrarianAuthCode, 500.0);
+    }
+
+    @Test
+    void withdrawSalary_NoSalaryFound() {
+        //Null value is found for salary instead of number
+        String userInput = String.join("\n",
+                "11",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(null);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        verify(mockedSystemOut).println("Salary couldn't be found.");
+        verify(mockedAccounts, never()).withdrawSalary(anyDouble());
+    }
+
     //    OPTION 12: Donate to Library
+
+    @Test
+    void donateToLibrary_SuccessfulDonation() {
+        //Donation runs fine
+        String userInput = String.join("\n",
+                "12",
+                testLibrarianUser,
+                testLibrarianAuthCode,
+                "100",
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
+                .thenReturn(Librarians.AuthType.FULL_TIME);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        verify(mockedAccounts).depositDonation(100.0);
+        verify(mockedSystemOut).println("Thank you for donating $100.0!");
+    }
+
+    @Test
+    void donateToLibrary_FailedAuth() {
+        //Donation does not work, auth fails
+        String userInput = String.join("\n",
+                "12",
+                "wrongUser",
+                "wrongCode",
+                "",
+                cliExitOption
+        );
+
+        when(mockedLibrarians.authLibrarian(anyString(), anyString()))
+                .thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
+
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        cli.run();
+
+        verify(mockedAccounts, never()).depositDonation(anyDouble());
+    }
 
     //    OPTION 13: Log In
     @Test
@@ -1030,7 +1284,7 @@ public class CLITest {
         assertEquals(Librarians.AuthType.FULL_TIME, cli.currentLibrarian.authType);
     }
 
-    //    OPTION 15: Log Out
+    //    OPTION 14: Log Out
     @Test
     void logOutTest() {
         // Correct output should be printed
@@ -1073,13 +1327,93 @@ public class CLITest {
     //    OPTION 15: Exit
 
     @Test
-    void exitTestShouldSucceed() {
+    void exitTestShouldSucceed1() {
         // Chooses Exit and program exits
 
         // Arrange
         // Fake user input: 10 (Exit), then anything to continue
         String userInput = String.join("\n",
                 this.cliExitOption // Program should end after exit is requested
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert that Exit was called and set exit to true
+        assertEquals(true, cli.exit);
+    }
+
+    @Test
+    void exitTestShouldSucceed2() {
+        // Chooses Exit and program exits
+
+        // Arrange
+        // Fake user input: 10 (Exit), then anything to continue
+        String userInput = String.join("\n",
+                "x" // Program should end after exit is requested
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert that Exit was called and set exit to true
+        assertEquals(true, cli.exit);
+    }
+
+    @Test
+    void exitTestShouldSucceed3() {
+        // Chooses Exit and program exits
+
+        // Arrange
+        // Fake user input: 10 (Exit), then anything to continue
+        String userInput = String.join("\n",
+                "X" // Program should end after exit is requested
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert that Exit was called and set exit to true
+        assertEquals(true, cli.exit);
+    }
+
+    @Test
+    void exitTestShouldSucceed4() {
+        // Chooses Exit and program exits
+
+        // Arrange
+        // Fake user input: 10 (Exit), then anything to continue
+        String userInput = String.join("\n",
+                "q" // Program should end after exit is requested
+        );
+
+        // Create CLI with fake input
+        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
+
+        // Act
+        cli.run();
+
+        // Assert that Exit was called and set exit to true
+        assertEquals(true, cli.exit);
+    }
+
+    @Test
+    void exitTestShouldSucceed5() {
+        // Chooses Exit and program exits
+
+        // Arrange
+        // Fake user input: 10 (Exit), then anything to continue
+        String userInput = String.join("\n",
+                "Q" // Program should end after exit is requested
         );
 
         // Create CLI with fake input
@@ -1802,57 +2136,6 @@ public class CLITest {
     // OPTION 10: Hire Part-Time Librarian
 
     @Test
-    void hirePartTimeLibrarian_Successful() {
-        // Arrange
-        //Hires a librarian, succeeds
-        String newUsername = "newPartTimer";
-        String userInput = String.join("\n",
-                "10",
-                testLibrarianUser,
-                testLibrarianAuthCode,
-                newUsername,
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(Librarians.AuthType.FULL_TIME);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        cli.run();
-
-        // Assert/Verify
-        verify(mockedLibrarians).hirePartTimeLibrarian(testLibrarianUser, testLibrarianAuthCode, newUsername);
-    }
-
-    @Test
-    void hirePartTimeLibrarian_FailedAuth() {
-        // Arrange
-        //Tries to hire but fails
-        String newUsername = "newPartTimer";
-        String userInput = String.join("\n",
-                "10",
-                "wrongUsername",
-                "wrongCode",
-                newUsername, // still provide username
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(anyString(), anyString()))
-                .thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        // Act
-        cli.run();
-
-        // Assert
-        verify(mockedLibrarians, never()).hirePartTimeLibrarian(anyString(), anyString(), anyString());
-    }
-
-    @Test
     void hirePartTimeLibrarian_EmptyUsername() {
         // Arrange
         //Attempt to hire is made but none is added if username is blank
@@ -1883,62 +2166,6 @@ public class CLITest {
     //    OPTION 11: Withdraw Salary
 
     @Test
-    void withdrawSalary_SuccessfulFullSalary() {
-        //Full Salary is found and withdrawn
-        String userInput = String.join("\n",
-                "11",
-                testLibrarianUser,
-                testLibrarianAuthCode,
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(Librarians.AuthType.FULL_TIME);
-        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(1000.0);
-        when(mockedAccounts.withdrawSalary(1000.0))
-                .thenReturn(1000.0);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        cli.run();
-
-        verify(mockedLibrarians).librarianWithdrewSalary(testLibrarianUser, testLibrarianAuthCode, 1000.0);
-    }
-
-    @Test
-    void withdrawSalary_SalaryLessThanExpected() {
-        // Does not withdraw salary,withdraw is less
-        String userInput = String.join("\n",
-                "11",
-                testLibrarianUser,
-                testLibrarianAuthCode,
-                "",
-                "13",
-                ""
-        );
-
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(Librarians.AuthType.FULL_TIME);
-        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(1000.0);
-        when(mockedAccounts.withdrawSalary(1000.0))
-                .thenReturn(500.0); // Withdraw less than expected
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        // Act
-        cli.run();
-
-        // Assert
-        verify(mockedSystemOut).println("Salary: $500.0 is less than expected: $1000.0");
-        verify(mockedLibrarians).librarianWithdrewSalary(testLibrarianUser, testLibrarianAuthCode, 500.0);
-    }
-
-
-
-    @Test
     void withdrawSalary_FailedAuth() {
         //Withdraw does not work, auth fails
         String userInput = String.join("\n",
@@ -1960,55 +2187,7 @@ public class CLITest {
         verify(mockedAccounts, never()).withdrawSalary(anyDouble());
     }
 
-    @Test
-    void withdrawSalary_NoSalaryFound() {
-        //Null value is found for salary instead of number
-        String userInput = String.join("\n",
-                "11",
-                testLibrarianUser,
-                testLibrarianAuthCode,
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(Librarians.AuthType.FULL_TIME);
-        when(mockedLibrarians.getSalary(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(null);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        cli.run();
-
-        verify(mockedSystemOut).println("Salary couldn't be found.");
-        verify(mockedAccounts, never()).withdrawSalary(anyDouble());
-    }
-
-
     //    OPTION 12: Donate to Library
-
-    @Test
-    void donateToLibrary_SuccessfulDonation() {
-        //Donation runs fine
-        String userInput = String.join("\n",
-                "12",
-                testLibrarianUser,
-                testLibrarianAuthCode,
-                "100",
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(testLibrarianUser, testLibrarianAuthCode))
-                .thenReturn(Librarians.AuthType.FULL_TIME);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        cli.run();
-
-        verify(mockedAccounts).depositDonation(100.0);
-        verify(mockedSystemOut).println("Thank you for donating $100.0!");
-    }
 
     @Test
     void donateToLibrary_InvalidDonation_BlankInput() {
@@ -2055,26 +2234,4 @@ public class CLITest {
         verify(mockedSystemOut).println("Donation abcmust be a number.");
         verify(mockedAccounts, never()).depositDonation(anyDouble());
     }
-
-    @Test
-    void donateToLibrary_FailedAuth() {
-        //Donation does not work, auth fails
-        String userInput = String.join("\n",
-                "12",
-                "wrongUser",
-                "wrongCode",
-                "",
-                cliExitOption
-        );
-
-        when(mockedLibrarians.authLibrarian(anyString(), anyString()))
-                .thenReturn(Librarians.AuthType.NOT_AUTHORIZED);
-
-        cli = new CLI(new StringReader(userInput), mockedSystemOut, mockedLibrary, mockedAccounts, mockedLibrarians);
-
-        cli.run();
-
-        verify(mockedAccounts, never()).depositDonation(anyDouble());
-    }
-
 }

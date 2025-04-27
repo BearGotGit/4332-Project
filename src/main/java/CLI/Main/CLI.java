@@ -301,6 +301,7 @@ public class CLI {
                         break;
                     }
                     librarians.hirePartTimeLibrarian(auth.username, auth.authCode, newUsername);
+                    break;
                 }
                 // 11. Withdraw Salary
                 case "11": {
@@ -323,6 +324,7 @@ public class CLI {
                         outStream.println("Salary: $" + salary + " is less than expected: $" + expectedSalary);
                     }
                     librarians.librarianWithdrewSalary(auth.username, auth.authCode, salary);
+                    break;
                 }
                 // 12. Donate to Library
                 case "12": {

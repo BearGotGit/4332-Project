@@ -1,20 +1,22 @@
 # Library Management CLI Project
+Built by: Alex Brodsky, Berend Grandt, Shawn Russell, & Bruce Brown
 
-To run the CLI on Mac/Linux or GitBash:
+### Run the CLI
+Mac/Linux or GitBash:
 ```sh
 cd 4332-Project
 ./run.sh # or `make run`
 ```
 
-To run the CLI on Windows without GitBash:
+Windows without GitBash:
 ```sh
 cd 4332-Project
 make run
 ```
 
-Or just open the root folder (4332-Project) in IntelliJ and hit the green arrow
+Or just open the root folder (4332-Project) in **IntelliJ** and hit the green arrow on Main.java.
 
-To run the tests in IntelliJ:
+### Run the Tests in IntelliJ:
  * Open the project at the root 4332-Project in IntelliJ
  * Right-click on the `test` folder
    * Click `Run 'All Tests'`

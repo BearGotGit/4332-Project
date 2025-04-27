@@ -28,9 +28,9 @@ public class CLI {
     }
 
     public void run() {
-        String stars = "*****************************************************************";
+        String stars = "*******************************************************************";
 
-        System.out.print("\n" + stars + "\nBuilt by: Alex Brodsky, Berend Grandt, Shawn Russell, Bruce Brown");
+        System.out.print("\n" + stars + "\nBuilt by: Alex Brodsky, Berend Grandt, Shawn Russell, & Bruce Brown");
 
         String input = "";
 
@@ -458,7 +458,7 @@ public class CLI {
             return currentLibrarian;
         }
 
-        outStream.print("Enter your auth code: ");
+        outStream.print("Enter your authentication code: ");
         String authCode = scanner.nextLine();
         authCode = authCode.isBlank() ? null : authCode;
         AuthResult result = new AuthResult(username, authCode, librarians.authLibrarian(username, authCode));
